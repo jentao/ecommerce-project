@@ -1,0 +1,26 @@
+.productimg {
+  width: 250px;
+}
+
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.product {
+  padding-left: 25px;
+  transition: all 200ms ease-out;
+}
+
+.product:hover {
+  box-shadow: 0px 0px 5px grey;
+}
+
+.price {
+  color: ghostwhite;
+}
+
+.hidden {
+  display: none;
+}

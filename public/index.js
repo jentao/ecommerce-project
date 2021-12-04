@@ -27,16 +27,16 @@
    * show home page
    */
   function showHome() {
-    id("products").classList.remove("hidden");
-    id("itemview").classList.add("hidden");
+    qs(".products").classList.remove("hidden");
+    qs(".itemview").classList.add("hidden");
   }
 
   /**
    * show item page
    */
   function showItem() {
-    id("products").classList.add("hidden");
-    id("itemview").classList.remove("hidden");
+    qs(".products").classList.add("hidden");
+    qs(".itemview").classList.remove("hidden");
   }
 
   /** ------------------------------ Helper Functions  ------------------------------ */

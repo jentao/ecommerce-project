@@ -7,7 +7,7 @@
   It seperate the stack and queue section by color, and
   includes styles for elements in each data structure.
 */
-#itemview {
+.itemview {
   width: 80%;
   display: flex;
   flex-direction: row;
@@ -15,15 +15,15 @@
   align-items: flex-start;
 }
 
-#itemview .item-desc {
+.itemview .item-desc {
   white-space: pre-line;
 }
 
-#itemview .item-name {
+.itemview .item-name {
   font-size: 34px;
 }
 
-#itemview #unavailable {
+.itemview #unavailable {
   border-style: solid;
   border-width: 2px;
   border-color: gray;
