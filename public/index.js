@@ -15,6 +15,28 @@
    * sets up necessary functionality when page loads
    */
   function init() {
+    showHome();
+    id("home-btn").addEventListener("click", showHome);
+    let cards = qsa(".product");
+    for (let i = 0; i < cards.length; i++) {
+      cards[i].addEventListener("click", showItem);
+    }
+  }
+
+  /**
+   * show home page
+   */
+  function showHome() {
+    id("products").classList.remove("hidden");
+    id("itemview").classList.add("hidden");
+  }
+
+  /**
+   * show item page
+   */
+  function showItem() {
+    id("products").classList.add("hidden");
+    id("itemview").classList.remove("hidden");
   }
 
   /** ------------------------------ Helper Functions  ------------------------------ */
@@ -36,4 +58,21 @@
     return document.createElement(tagName);
   }
 
+  /**
+   * Returns the first element that matches the given CSS selector.
+   * @param {string} selector - CSS query selector.
+   * @returns {object} The first DOM object matching the query.
+   */
+  function qs(selector) {
+    return document.querySelector(selector);
+  }
+
+  /**
+   * Returns the array of elements that match the given CSS selector.
+   * @param {string} selector - CSS query selector
+   * @returns {object[]} array of DOM objects matching the query.
+   */
+  function qsa(selector) {
+    return document.querySelectorAll(selector);
+  }
 })();

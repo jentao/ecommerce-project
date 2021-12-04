@@ -28,3 +28,7 @@
   border-width: 2px;
   border-color: gray;
 }
+
+.hidden {
+  display: none;
+}
