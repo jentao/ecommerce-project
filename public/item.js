@@ -15,6 +15,21 @@
    * sets up necessary functionality when page loads
    */
   function init() {
+    toggleButton();
+  }
+
+  /**
+   * Toggle btn
+   */
+  function toggleButton() {
+    let btn = id("buy-btn");
+    if (Math.random() < 0.5) {
+      btn.disabled = false;
+      btn.textContent = "Buy";
+    } else {
+      btn.disabled = true;
+      btn.textContent = "Currently Unavailable";
+    }
   }
 
   /** ------------------------------ Helper Functions  ------------------------------ */

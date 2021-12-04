@@ -18,3 +18,13 @@
 #itemview .item-desc {
   white-space: pre-line;
 }
+
+#itemview .item-name {
+  font-size: 34px;
+}
+
+#itemview #unavailable {
+  border-style: solid;
+  border-width: 2px;
+  border-color: gray;
+}
