@@ -12,6 +12,7 @@ const PORT_NUM = 8000;
 const CLIENT_ERROR = 400;
 const SERVER_ERROR = 400;
 const SERVER_ERROR_MSG = "An error occurred on the server. Try again later.";
+const COOKIE_EXPIRATION = 1000 * 60 * 60 * 3;
 
 const express = require("express");
 const app = express();
@@ -25,9 +26,11 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 
 /**
- * Get all the yip data or yip data matching a given search term
+ * Get all the items data or items data matching a given search term (name/desc/type)
+ * /darksouls/items/?search=big&type=sword&min=0&max=100
  */
-app.get('/yipper/yips', async function(req, res) {
+app.get('/darksouls/items', async function(req, res) {
+  // let keyword = req.query.search ? req.query.search : "";
   try {
     let yips;
     let db = await getDBConnection();
@@ -47,11 +50,46 @@ app.get('/yipper/yips', async function(req, res) {
   }
 });
 
+// Logs the user into the webservice, setting a login cookie that expires in 3 hours.
+app.post('/darksouls/login', async function(req, res) {
+  res.type('text');
+  let user = req.body.username;
+  let pass = req.body.password;
+  if (!user || !pass) {
+    res.status(CLIENT_ERROR).send('Missing required parameters username and password!');
+  } else {
+    try {
+      if (!(await checkCredentials(user, pass))) {
+        res.status(CLIENT_ERROR).send('Invalid credentials.');
+      } else {
+        let id = await getSessionId();
+        await setSessionId(id, user);
+        res.cookie('sessionid', id, {expires: new Date(Date.now() + COOKIE_EXPIRATION)});
+        res.send('Successfully logged in!');
+      }
+    } catch (err) {
+      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    }
+  }
+});
+
+// Logs a user out by expiring their cookie.
+app.post('/darksouls/logout', function(req, res) {
+  res.type('text');
+  let id = req.cookies['sessionid'];
+  if (id) {
+    res.clearCookie('sessionid');
+    res.send('Successfully logged out!');
+  } else {
+    res.send('Already logged out.');
+  }
+});
+
 /**
- * Get yip data for a designated user
+ * Get information of a specific item
  */
-app.get('/yipper/user/:user', async function(req, res) {
-  let user = req.params.user;
+app.get('/darksouls/item/:id', async function(req, res) {
+  let user = req.params.id;
   try {
     let db = await getDBConnection();
     let yips = await db
@@ -70,9 +108,10 @@ app.get('/yipper/user/:user', async function(req, res) {
 });
 
 /**
- * Update the likes for a designated yip
+ * Process a purchase of an item
  */
-app.post("/yipper/likes", async function(req, res) {
+app.post("/darksouls/buy", async function(req, res) {
+  // req.body.id, req.body.cookies[]
   if (req.body.id) {
     try {
       let db = await getDBConnection();
@@ -99,9 +138,72 @@ app.post("/yipper/likes", async function(req, res) {
 });
 
 /**
- * Add a new yip with given name and the full yip text
+ * Get transaction history for the user
  */
-app.post("/yipper/new", async function(req, res) {
+app.post("/darksouls/history", async function(req, res) {
+  // req.body.cookies[]
+  if (req.body.id) {
+    try {
+      let db = await getDBConnection();
+      let id = req.body.id;
+      let row = await db.get('SELECT id FROM yips WHERE id=\'' + id + '\'');
+      if (row) {
+        await db.run('UPDATE yips SET likes=likes+1 WHERE id=' + id);
+        let result = await db.get('SELECT likes FROM yips WHERE id=' + id);
+        await db.close();
+        res.type('text');
+        res.send(result.likes.toString());
+      } else {
+        res.type('text');
+        res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
+      }
+    } catch (err) {
+      res.type('text');
+      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    }
+  } else {
+    res.type('text');
+    res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+  }
+});
+
+/**
+ * Update rating of a product
+ */
+app.post("/darksouls/rating", async function(req, res) {
+  // req.body.cookies[], req.body.item, req.body.rating, req.body.comment
+
+  // return JSON {avg rating, new comment}
+  if (req.body.id) {
+    try {
+      let db = await getDBConnection();
+      let id = req.body.id;
+      let row = await db.get('SELECT id FROM yips WHERE id=\'' + id + '\'');
+      if (row) {
+        await db.run('UPDATE yips SET likes=likes+1 WHERE id=' + id);
+        let result = await db.get('SELECT likes FROM yips WHERE id=' + id);
+        await db.close();
+        res.type('text');
+        res.send(result.likes.toString());
+      } else {
+        res.type('text');
+        res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
+      }
+    } catch (err) {
+      res.type('text');
+      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    }
+  } else {
+    res.type('text');
+    res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+  }
+});
+
+/**
+ * Add a new new user
+ */
+app.post("/darksouls/newuser", async function(req, res) {
+  // req.body.email, req.body.password, req.body.username
   if (req.body.name && req.body.full) {
     try {
       let name = req.body.name;
@@ -140,6 +242,52 @@ async function getDBConnection() {
     driver: sqlite3.Database
   });
   return db;
+}
+
+/**
+ * Generates an unused sessionid and returns it to the user.
+ * @returns {string} - The random session id.
+ */
+async function getSessionId() {
+  let query = 'SELECT sessionid FROM users WHERE sessionid = ?';
+  let id;
+  let db = await getDBConnection();
+  const BASE = 36;
+  const LAST_DIGIT = 15;
+  do {
+    // This wizardry comes from https://gist.github.com/6174/6062387
+    id = Math.random().toString(BASE)
+      .substring(2, LAST_DIGIT) + Math.random().toString(BASE)
+      .substring(2, LAST_DIGIT);
+  } while (((await db.all(query, id)).length) > 0);
+  await db.close();
+  return id;
+}
+
+/**
+ * Checks Credentials
+ * @param {string} user - The username to check
+ * @param {string} pass - The password to check
+ * @returns {boolean} - True if the credentials match for a user, false otherwise.
+ */
+async function checkCredentials(user, pass) {
+  let query = 'SELECT username FROM users WHERE username = ? AND password = ?;';
+  let db = await getDBConnection();
+  let results = await db.all(query, [user, pass]);
+  await db.close();
+  return (results.length > 0);
+}
+
+/**
+ * Sets the session id in the database to the given one for the given user.
+ * @param {string} id - The Session id to set
+ * @param {string} user - The username of the person to set the id for
+ */
+async function setSessionId(id, user) {
+  let query = 'UPDATE users SET sessionid = ? WHERE username = ?';
+  let db = await getDBConnection();
+  await db.all(query, [id, user]);
+  await db.close();
 }
 
 /**
