@@ -25,6 +25,9 @@ app.use(multer().none());
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 /**
  * Get all the items data or items data matching a given search term (name/desc/type)
  * /darksouls/items/?search=big&type=sword&min=0&max=100
