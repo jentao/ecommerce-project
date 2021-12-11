@@ -10,7 +10,7 @@
 'use strict';
 const PORT_NUM = 8000;
 const CLIENT_ERROR = 400;
-const SERVER_ERROR = 400;
+const SERVER_ERROR = 500;
 const SERVER_ERROR_MSG = "An error occurred on the server. Try again later.";
 const COOKIE_EXPIRATION = 1000 * 60 * 60 * 3;
 
@@ -28,45 +28,57 @@ const sqlite = require('sqlite');
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+const types = ['melee', 'ranged', 'consumable', 'miracle', 'pyromancy', 'sorcery'];
+
+/**
+ * Return all item types
+ */
+app.get('/darksouls/types', function(req, res) {
+  res.json(types);
+});
+
 /**
  * Get all the items data or items data matching a given search term (name/desc/type)
- * /darksouls/items/?search=big&type=sword&min=0&max=100
  */
 app.get('/darksouls/items', async function(req, res) {
-  // let keyword = req.query.search ? req.query.search : "";
-  try {
-    let yips;
-    let db = await getDBConnection();
-    if (req.query.search) {
-      let keyword = req.query.search;
-      yips = await db
-        .all('SELECT id FROM yips WHERE yip LIKE \'%' +
-          keyword + '%\' ORDER BY id;');
-    } else {
-      yips = await db.all('SELECT * FROM yips ORDER BY DATETIME(date) DESC;');
-    }
-    await db.close();
-    res.json({"yips": yips});
-  } catch (err) {
+  let name = req.query.name ? req.query.name : "";
+  let desc = req.query.desc ? req.query.desc : "";
+  let type = req.query.type ? req.query.type : "";
+  if (!(types.includes(type) || type === '')) {
     res.type('text');
-    res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    res.status(CLIENT_ERROR).send('Invalid type');
+  } else {
+    try {
+      let items;
+      let db = await getDBConnection();
+      let qry = 'SELECT * FROM items WHERE itemName LIKE \'%' + name + '%\' ' +
+      'AND lore LIKE \'%' + desc + '%\' ' +
+      'AND itemType LIKE \'%' + type + '%\' ' +
+      ' ORDER BY itemid;';
+      items = await db.all(qry);
+      await db.close();
+      res.json(items);
+    } catch (err) {
+      res.type('text');
+      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    }
   }
 });
 
 // Logs the user into the webservice, setting a login cookie that expires in 3 hours.
 app.post('/darksouls/login', async function(req, res) {
   res.type('text');
-  let user = req.body.username;
+  let email = req.body.email;
   let pass = req.body.password;
-  if (!user || !pass) {
+  if (!email || !pass) {
     res.status(CLIENT_ERROR).send('Missing required parameters username and password!');
   } else {
     try {
-      if (!(await checkCredentials(user, pass))) {
+      if (!(await checkCredentials(email, pass))) {
         res.status(CLIENT_ERROR).send('Invalid credentials.');
       } else {
         let id = await getSessionId();
-        await setSessionId(id, user);
+        await setSessionId(id, email);
         res.cookie('sessionid', id, {expires: new Date(Date.now() + COOKIE_EXPIRATION)});
         res.send('Successfully logged in!');
       }
@@ -92,18 +104,17 @@ app.post('/darksouls/logout', function(req, res) {
  * Get information of a specific item
  */
 app.get('/darksouls/item/:id', async function(req, res) {
-  let user = req.params.id;
+  let id = req.params.id;
   try {
     let db = await getDBConnection();
-    let yips = await db
-      .all('SELECT name, yip, hashtag, date FROM yips WHERE name=\'' +
-      user + '\' ORDER BY DATETIME(date) DESC;');
+    let q1 = 'SELECT * FROM items WHERE itemid = ? ;';
+    let items = await db.all(q1, [id]);
     await db.close();
-    if (yips.length === 0) {
+    if (items.length === 0) {
       res.type('text');
-      res.status(CLIENT_ERROR).send("Yikes. User does not exist.");
+      res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
     }
-    res.json(yips);
+    res.json(items);
   } catch (err) {
     res.type('text');
     res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
@@ -114,29 +125,32 @@ app.get('/darksouls/item/:id', async function(req, res) {
  * Process a purchase of an item
  */
 app.post("/darksouls/buy", async function(req, res) {
-  // req.body.id, req.body.cookies[]
-  if (req.body.id) {
-    try {
-      let db = await getDBConnection();
-      let id = req.body.id;
-      let row = await db.get('SELECT id FROM yips WHERE id=\'' + id + '\'');
-      if (row) {
-        await db.run('UPDATE yips SET likes=likes+1 WHERE id=' + id);
-        let result = await db.get('SELECT likes FROM yips WHERE id=' + id);
-        await db.close();
+  // let sessionid = req.cookies['sessionid'];
+  let sessionid = 3;
+  try {
+    let db = await getDBConnection();
+    let itemid = req.body.id;
+    let q1 = 'SELECT price, capacity FROM items WHERE itemid = ? ;';
+    let item = await db.get(q1, [itemid]);
+    let err = await checkBuy(itemid, sessionid, item.capacity);
+    if (err !== '') {
+      res.status(CLIENT_ERROR).send(err);
+    } else {
+      let q2 = 'SELECT userid, balance FROM users WHERE sessionid = ? ;';
+      let user = await db.get(q2, [sessionid]);
+      if (user.balance < item.price) {
         res.type('text');
-        res.send(result.likes.toString());
+        res.status(CLIENT_ERROR).send('User does not have enough souls.');
       } else {
+        await db.close();
+        let oid = await order(itemid, item, user);
         res.type('text');
-        res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
+        res.send(oid);
       }
-    } catch (err) {
-      res.type('text');
-      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
     }
-  } else {
+  } catch (err) {
     res.type('text');
-    res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+    res.status(SERVER_ERROR).send(err);
   }
 });
 
@@ -144,22 +158,16 @@ app.post("/darksouls/buy", async function(req, res) {
  * Get transaction history for the user
  */
 app.post("/darksouls/history", async function(req, res) {
-  // req.body.cookies[]
-  if (req.body.id) {
+  // let sessionid = req.cookies['sessionid'];
+  let sessionid = 3;
+  if (sessionid) {
     try {
       let db = await getDBConnection();
-      let id = req.body.id;
-      let row = await db.get('SELECT id FROM yips WHERE id=\'' + id + '\'');
-      if (row) {
-        await db.run('UPDATE yips SET likes=likes+1 WHERE id=' + id);
-        let result = await db.get('SELECT likes FROM yips WHERE id=' + id);
-        await db.close();
-        res.type('text');
-        res.send(result.likes.toString());
-      } else {
-        res.type('text');
-        res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
-      }
+      let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
+      let user = await db.get(q1, [sessionid]);
+      let q2 = 'SELECT * FROM orders WHERE userid = ? ;';
+      let orders = await db.all(q2, [user.userid]);
+      res.json(orders);
     } catch (err) {
       res.type('text');
       res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
@@ -171,34 +179,49 @@ app.post("/darksouls/history", async function(req, res) {
 });
 
 /**
- * Update rating of a product
+ * Adds a new rating for a product
  */
-app.post("/darksouls/rating", async function(req, res) {
-  // req.body.cookies[], req.body.item, req.body.rating, req.body.comment
-
-  // return JSON {avg rating, new comment}
-  if (req.body.id) {
+app.post("/darksouls/rate", async function(req, res) {
+  // let sessionid = req.cookies['sessionid'];
+  let sessionid = 3;
+  if (sessionid && req.body.id && req.body.stars && req.body.stars <= 5 && req.body.stars >= 1) {
     try {
       let db = await getDBConnection();
-      let id = req.body.id;
-      let row = await db.get('SELECT id FROM yips WHERE id=\'' + id + '\'');
-      if (row) {
-        await db.run('UPDATE yips SET likes=likes+1 WHERE id=' + id);
-        let result = await db.get('SELECT likes FROM yips WHERE id=' + id);
-        await db.close();
-        res.type('text');
-        res.send(result.likes.toString());
-      } else {
-        res.type('text');
-        res.status(CLIENT_ERROR).send("Yikes. ID does not exist.");
-      }
+      let itemid = req.body.id;
+      let stars = req.body.stars;
+      let comment = req.body.comment ? req.body.comment : "";
+      let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
+      let user = await db.get(q1, [sessionid]);
+      let q2 = 'INSERT INTO ratings (userid,itemid,comment,stars) VALUES( ?, ?, ?, ? );';
+      await db.run(q2, [user.userid, itemid, comment, stars]);
+      res.type('text');
+      res.send('succeed');
     } catch (err) {
       res.type('text');
       res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
     }
   } else {
     res.type('text');
-    res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+    res.status(CLIENT_ERROR).send("Invalid Params.");
+  }
+});
+
+/**
+ * get all the ratings and the average stars of the specified items
+ */
+app.get('/darksouls/ratings/:id', async function(req, res) {
+  let itemid = req.params.id;
+  try {
+    let db = await getDBConnection();
+    let q1 = 'SELECT * FROM ratings WHERE itemid = ? ;';
+    let ratings = await db.all(q1, [itemid]);
+    let q2 = 'SELECT avg(stars) FROM ratings WHERE itemid = ? ;';
+    let avg = await db.get(q2, [itemid]);
+    await db.close();
+    res.json({ratings, avg});
+  } catch (err) {
+    res.type('text');
+    res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -206,30 +229,20 @@ app.post("/darksouls/rating", async function(req, res) {
  * Add a new new user
  */
 app.post("/darksouls/newuser", async function(req, res) {
-  // req.body.email, req.body.password, req.body.username
-  if (req.body.name && req.body.full) {
-    try {
-      let name = req.body.name;
-      let db = await getDBConnection();
-      let row = await db.get('SELECT id FROM yips WHERE name=\'' + name + '\'');
-      try {
-        let processed = processYip(req.body.full, row);
-        let qry = 'INSERT INTO yips (name, yip, hashtag, likes) VALUES (?, ?, ?, ?)';
-        let inserted = await db.run(qry, [name, processed[0], processed[1], 0]);
-        let result = await db.get('SELECT * FROM yips WHERE id=' + inserted.lastID);
-        await db.close();
-        res.json(result);
-      } catch (error) {
-        res.type('text');
-        res.status(CLIENT_ERROR).send(error.message);
-      }
-    } catch (err) {
-      res.type('text');
-      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
-    }
-  } else {
+  if (!req.body.email || !req.body.passcode || !req.body.username) {
     res.type('text');
     res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+  } else if (await checkEmail(req.body.email)) {
+    res.type('text');
+    res.status(CLIENT_ERROR).send("Email already exist.");
+  } else {
+    const startingSouls = 35000;
+    let db = await getDBConnection();
+    let q2 = 'INSERT INTO users (username,email,passcode,balance) VALUES( ?, ?, ?, ? );';
+    await db.run(q2, [req.body.username, req.body.email, req.body.passcode, startingSouls]);
+    await db.close();
+    res.type('text');
+    res.send('registered');
   }
 });
 
@@ -269,14 +282,14 @@ async function getSessionId() {
 
 /**
  * Checks Credentials
- * @param {string} user - The username to check
+ * @param {string} email - The email to check
  * @param {string} pass - The password to check
  * @returns {boolean} - True if the credentials match for a user, false otherwise.
  */
-async function checkCredentials(user, pass) {
-  let query = 'SELECT username FROM users WHERE username = ? AND password = ?;';
+async function checkCredentials(email, pass) {
+  let query = 'SELECT email FROM users WHERE email = ? AND passcode = ?;';
   let db = await getDBConnection();
-  let results = await db.all(query, [user, pass]);
+  let results = await db.all(query, [email, pass]);
   await db.close();
   return (results.length > 0);
 }
@@ -284,34 +297,91 @@ async function checkCredentials(user, pass) {
 /**
  * Sets the session id in the database to the given one for the given user.
  * @param {string} id - The Session id to set
- * @param {string} user - The username of the person to set the id for
+ * @param {string} email - The email of the person to set the id for
  */
-async function setSessionId(id, user) {
-  let query = 'UPDATE users SET sessionid = ? WHERE username = ?';
+async function setSessionId(id, email) {
+  let query = 'UPDATE users SET sessionid = ? WHERE email = ?';
   let db = await getDBConnection();
-  await db.all(query, [id, user]);
+  await db.all(query, [id, email]);
   await db.close();
 }
 
 /**
- * Returns the processed yip and hashtag based on the input text and user name
- * @param {string} full the full text of an yip post
- * @param {array} row the row that contains the user name from database
- * @returns {array} - an array of 2 strings: [yip, hashtag]
- * @throws "Yikes. Yip format is invalid." if the input string does not match yip format
- * @throws "Yikes. User does not exist." if the input username does not exist in the database
+ * Checks is itemid exist in items
+ * @param {string} itemid - The id to check
+ * @returns {boolean} - True if the itemid exist in items, false otherwise.
  */
-function processYip(full, row) {
-  if (!row) {
-    throw new Error("Yikes. User does not exist.");
+async function checkid(itemid) {
+  let query = 'SELECT itemid FROM items WHERE itemid = ? ;';
+  let db = await getDBConnection();
+  let results = await db.all(query, [itemid]);
+  await db.close();
+  return (results.length > 0);
+}
+
+/**
+ * Returns true if the user is logged in and false otherwise
+ * @param {string} sessionid the sessionid of the current user
+ * @returns {array} - an array of 2 strings: [yip, hashtag]
+ */
+async function checkUser(sessionid) {
+  let query = 'SELECT username FROM users WHERE sessionid = ? ;';
+  let db = await getDBConnection();
+  let results = await db.all(query, [sessionid]);
+  await db.close();
+  return (results.length > 0);
+}
+
+/**
+ * checks the prereqs of before buying an item
+ * @param {int} itemid id of the item
+ * @param {string} sessionid sessionid of the user
+ * @param {int} capacity stocks left for the product
+ * @returns {string} the error message, returns '' if no error
+ */
+async function checkBuy(itemid, sessionid, capacity) {
+  if (!itemid) {
+    return ("Missing one or more of the required params.");
+  } else if (!checkUser(sessionid)) {
+    return ("User not logged in.");
+  } else if (!(await checkid(itemid))) {
+    return ("itemid does not exist");
+  } else if (capacity === 0) {
+    return ("Item out of stock");
   }
-  let parts = full.split("#");
-  if (parts.length !== 2 ||
-    parts[0].match(/[^a-zA-Z0-9_\s.!?]+/) ||
-    parts[1].match(/[^a-zA-Z0-9]+/)) {
-    throw new Error("Yikes. Yip format is invalid.");
-  }
-  return [parts[0].trim(), parts[1]];
+  return '';
+}
+
+/**
+ * process the transaction and update the database on the data provided
+ * @param {int} itemid id of the item
+ * @param {object} item an object cotaining information about the item
+ * @param {object} user the user that is making this transaction
+ * @returns {string} the order confirmation number
+ */
+async function order(itemid, item, user) {
+  let db = await getDBConnection();
+  let q3 = 'UPDATE items SET capacity=capacity-1 WHERE itemid= ? ;';
+  await db.run(q3, [itemid]);
+  let q4 = 'UPDATE users SET balance=balance- ? WHERE userid= ? ;';
+  await db.run(q4, [item.price, user.userid]);
+  let q5 = 'INSERT INTO orders (userid,itemid) VALUES( ?, ? );';
+  let insert = await db.run(q5, [user.userid, itemid]);
+  let oid = insert['lastID'];
+  await db.close();
+  return oid.toString();
+}
+
+/**
+ * check if the email already exist in the database
+ * @param {string} email email to check
+ */
+async function checkEmail(email) {
+  let query = 'SELECT email FROM users WHERE email = ? ;';
+  let db = await getDBConnection();
+  let results = await db.all(query, [email]);
+  await db.close();
+  return (results.length > 0);
 }
 
 app.use(express.static('public'));
