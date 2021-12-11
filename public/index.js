@@ -29,7 +29,7 @@
    * show home page
    */
   function showHome() {
-    qs(".products").classList.remove("hidden");
+    qs(".home").classList.remove("hidden");
     qs(".itemview").classList.add("hidden");
     qs(".login-view").classList.add("hidden");
     qs(".confirm-view").classList.add("hidden");
@@ -40,7 +40,7 @@
    * show login page
    */
   function showLogin() {
-    qs(".products").classList.add("hidden");
+    qs(".home").classList.add("hidden");
     qs(".itemview").classList.add("hidden");
     qs(".login-view").classList.remove("hidden");
     qs(".confirm-view").classList.add("hidden");
@@ -51,7 +51,7 @@
    * show login page
    */
   function showOrders() {
-    qs(".products").classList.add("hidden");
+    qs(".home").classList.add("hidden");
     qs(".itemview").classList.add("hidden");
     qs(".login-view").classList.add("hidden");
     qs(".confirm-view").classList.add("hidden");
@@ -62,7 +62,7 @@
    * show confirm page
    */
   function showConfirm() {
-    qs(".products").classList.add("hidden");
+    qs(".home").classList.add("hidden");
     qs(".itemview").classList.add("hidden");
     qs(".login-view").classList.add("hidden");
     qs(".confirm-view").classList.remove("hidden");
@@ -73,11 +73,27 @@
    * show item page
    */
   function showItem() {
+    toggleButton();
     qs(".login-view").classList.add("hidden");
-    qs(".products").classList.add("hidden");
+    qs(".home").classList.add("hidden");
     qs(".itemview").classList.remove("hidden");
     qs(".confirm-view").classList.add("hidden");
     qs(".order-view").classList.add("hidden");
+  }
+
+  /**
+   * Toggle btn
+   */
+  function toggleButton() {
+    let btn = id("buy-btn");
+    if (Math.random() < 1) {
+      btn.disabled = false;
+      btn.textContent = "Purchase";
+      btn.addEventListener("click", showConfirm);
+    } else {
+      btn.disabled = true;
+      btn.textContent = "Currently Unavailable";
+    }
   }
 
   /** ------------------------------ Helper Functions  ------------------------------ */

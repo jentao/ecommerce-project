@@ -1,4 +1,4 @@
-.productimg {
+.products .productimg {
   width: 250px;
 }
 
@@ -8,17 +8,106 @@
   justify-content: center;
 }
 
-.product {
+.products .product {
   padding-left: 25px;
   transition: all 200ms ease-out;
 }
 
-.product:hover {
+.products .product:hover {
   box-shadow: 0px 0px 5px grey;
 }
 
-.price {
+.products .price {
   color: ghostwhite;
+}
+
+.tools {
+  width: 100%;
+  margin: 20px 0;
+}
+
+/** Reference https://codepen.io/chriscoyier/pen/JjozJLv **/
+.tools .switch-wrapper {
+  top: -3px;
+  position: relative;
+  display: inline-block;
+}
+
+.switch-wrapper .switch-input {
+  display: none;
+}
+
+.switch-wrapper .switch-label {
+  color: white;
+  display: block;
+  width: 200px;
+  height: 28px;
+  text-indent: 60px;
+  clip: rect(0 0 0 0);
+  user-select: none;
+}
+
+.switch-wrapper .switch-label:before,
+.switch-label:after {
+  content: "";
+  display: block;
+  position: absolute;
+  cursor: pointer;
+}
+
+.switch-wrapper .switch-label:before {
+  width: 25%;
+  height: 100%;
+  background-color: #dedede;
+  border-radius: 9999em;
+  transition: background-color 0.25s ease;
+}
+
+.switch-wrapper .switch-label:after {
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
+  transition: left 0.25s ease;
+}
+
+.switch-wrapper .switch-input:checked + .switch-label:before {
+  background-color: #89c12d;
+}
+
+.switch-wrapper .switch-input:checked + .switch-label:after {
+  left: 24px;
+}
+
+#search-term {
+  margin-left: 10px;
+  width: 400px;
+  height: 24px;
+}
+
+.tools select {
+  width: 150px;
+  height: 27px;
+  font-family: 'Almendra', serif;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  margin: 0 5px;
+}
+
+#search-btn {
+  width: 100px;
+  height: 30px;
+  font-family: 'Almendra', serif;
+  font-weight: bold;
+}
+
+#filter-type {
+  float: right;
+  margin-right: 0;
 }
 
 .hidden {

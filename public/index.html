@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="products.css">
     <link rel="stylesheet" href="item.css">
     <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="orders.css">
+    <link rel="stylesheet" href="confirm.css">
     <link href="https://fonts.googleapis.com/css2?family=Almendra&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&display=swap" rel="stylesheet">
     <script src="index.js"></script>
@@ -33,42 +35,60 @@
     </section>
 
     <section class="main">
-      <section class='products'>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
-        <article class='product'>
-          <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-          <h3>Divine Blessing</h3>
-          <p class='price'>64999 souls</p>
-        </article>
+      <section class="home">
+        <div class="tools">
+          <div class="switch-wrapper">
+            <input id="switch" type="checkbox" class="switch-input">
+            <label for="switch" class="switch-label">Toggle View Mode</label>
+          </div>
+          <input id='search-term' type='text'>
+          <select name="search-mode" id="search-mode">
+            <option value="name">Item Name</option>
+            <option value="desc">Item Description</option>
+          </select>
+          <button id='search-btn'>Search</button>
+          <select name="filter-type" id="filter-type">
+            <option value="melee">Melee</option>
+            <option value="ranged">Ranged</option>
+          </select>
+        </div>
+        <section class='products'>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+          <article class='product'>
+            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+            <h3>Divine Blessing</h3>
+            <p class='price'>64999 souls</p>
+          </article>
+        </section>
       </section>
 
       <section class='itemview'>
@@ -113,10 +133,30 @@
         </section>
       </section>
 
-      <section class="confirm-view"></section>
+      <section class="confirm-view">
+        <h2>Item accquired!</h2>
+        <p>Order confirmation number: <b>2</b></p>
+        <div class="confirm-img"></div>
+      </section>
 
       <section class="order-view">
-
+        <h2>Order History</h2>
+        <div class="order">
+          <img class="item-img" src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+          <div class="order-info">
+            <p>Divine Blessing</p>
+            <p class='price'>64999 souls</p>
+            <p class="time">12/10/2021, 7:41:17 PM</p>
+          </div>
+        </div>
+        <div class="order">
+          <img class="item-img" src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
+          <div class="order-info">
+            <p>Divine Blessing</p>
+            <p class='price'>64999 souls</p>
+            <p class="time">12/10/2021, 7:41:17 PM</p>
+          </div>
+        </div>
       </section>
 
       <section class="login-view">

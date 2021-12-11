@@ -23,11 +23,11 @@
   font-size: 34px;
 }
 
-.rating {
+.iteminfo .rating {
   margin: 0;
 }
 
-.rating .token {
+.iteminfo .rating .token {
   background-image: url("https://static.wikia.nocookie.net/darksouls/images/9/9f/Sunlight_Medal_%28DSIII%29.png/revision/latest/scale-to-width-down/512?cb=20160614082340");
   background-repeat: no-repeat;
   background-position: -8px 0px;
@@ -37,7 +37,7 @@
   display: inline-block;
 }
 
-.rating-num {
+.iteminfo .rating-num {
   display: inline-block;
   position: relative;
   top: -20px;
@@ -46,7 +46,7 @@
   margin-inline-start: 0px;
 }
 
-.buy-btn {
+.iteminfo .buy-btn {
   background-color: white;
   border: none;
   box-shadow:
@@ -60,7 +60,7 @@
   font-weight: bold;
 }
 
-.unavaliable {
+.iteminfo .unavaliable {
   background-color: rgb(190, 190, 190);
   box-shadow: 0 0 0 black;
 }
@@ -72,30 +72,30 @@
   justify-content: center;
 }
 
-.review {
+.reviews .review {
   margin: 5px 0px;
 }
 
-.review-title {
+.reviews .review-title {
   text-align: center;
   font-size: 28px;
 }
 
-.username, .user-rating {
+.reviews .username, .reviews .user-rating {
   display: inline-block;
   margin: 0 15px;
 }
 
-.user-rating {
+.reviews .user-rating {
   font-size: 20px;
   font-weight: bold;
 }
 
-.review .time {
+.reviews .review .time {
   margin: 5px 15px;
 }
 
-.comment {
+.reviews .comment {
   color: white;
   font-weight: bold;
   font-size: 20px;
