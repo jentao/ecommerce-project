@@ -25,7 +25,7 @@
     let btn = id("buy-btn");
     if (Math.random() < 0.5) {
       btn.disabled = false;
-      btn.textContent = "Buy";
+      btn.textContent = "Purchase";
     } else {
       btn.disabled = true;
       btn.textContent = "Currently Unavailable";

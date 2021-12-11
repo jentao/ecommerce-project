@@ -16,6 +16,8 @@
    */
   function init() {
     showHome();
+    id("orders-btn").addEventListener("click", showOrders);
+    id("login-btn").addEventListener("click", showLogin);
     id("home-btn").addEventListener("click", showHome);
     let cards = qsa(".product");
     for (let i = 0; i < cards.length; i++) {
@@ -29,14 +31,53 @@
   function showHome() {
     qs(".products").classList.remove("hidden");
     qs(".itemview").classList.add("hidden");
+    qs(".login-view").classList.add("hidden");
+    qs(".confirm-view").classList.add("hidden");
+    qs(".order-view").classList.add("hidden");
+  }
+
+  /**
+   * show login page
+   */
+  function showLogin() {
+    qs(".products").classList.add("hidden");
+    qs(".itemview").classList.add("hidden");
+    qs(".login-view").classList.remove("hidden");
+    qs(".confirm-view").classList.add("hidden");
+    qs(".order-view").classList.add("hidden");
+  }
+
+  /**
+   * show login page
+   */
+  function showOrders() {
+    qs(".products").classList.add("hidden");
+    qs(".itemview").classList.add("hidden");
+    qs(".login-view").classList.add("hidden");
+    qs(".confirm-view").classList.add("hidden");
+    qs(".order-view").classList.remove("hidden");
+  }
+
+  /**
+   * show confirm page
+   */
+  function showConfirm() {
+    qs(".products").classList.add("hidden");
+    qs(".itemview").classList.add("hidden");
+    qs(".login-view").classList.add("hidden");
+    qs(".confirm-view").classList.remove("hidden");
+    qs(".order-view").classList.add("hidden");
   }
 
   /**
    * show item page
    */
   function showItem() {
+    qs(".login-view").classList.add("hidden");
     qs(".products").classList.add("hidden");
     qs(".itemview").classList.remove("hidden");
+    qs(".confirm-view").classList.add("hidden");
+    qs(".order-view").classList.add("hidden");
   }
 
   /** ------------------------------ Helper Functions  ------------------------------ */

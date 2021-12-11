@@ -7,7 +7,7 @@
   It seperate the stack and queue section by color, and
   includes styles for elements in each data structure.
 */
-.itemview {
+.iteminfo {
   width: 80%;
   display: flex;
   flex-direction: row;
@@ -15,18 +15,98 @@
   align-items: flex-start;
 }
 
-.itemview .item-desc {
+.iteminfo .item-desc {
   white-space: pre-line;
 }
 
-.itemview .item-name {
+.iteminfo .item-name {
   font-size: 34px;
 }
 
-.itemview #unavailable {
-  border-style: solid;
-  border-width: 2px;
-  border-color: gray;
+.rating {
+  margin: 0;
+}
+
+.rating .token {
+  background-image: url("https://static.wikia.nocookie.net/darksouls/images/9/9f/Sunlight_Medal_%28DSIII%29.png/revision/latest/scale-to-width-down/512?cb=20160614082340");
+  background-repeat: no-repeat;
+  background-position: -8px 0px;
+  background-size: 50px 50px;
+  width: 32px;
+  height: 50px;
+  display: inline-block;
+}
+
+.rating-num {
+  display: inline-block;
+  position: relative;
+  top: -20px;
+  font-size: 20px;
+  margin-inline-end: 20px;
+  margin-inline-start: 0px;
+}
+
+.buy-btn {
+  background-color: white;
+  border: none;
+  box-shadow:
+    0 0 20px #cabe87,
+    0 0 10px #ffffff;
+  padding: 5px 30px;
+  text-align: center;
+  font-size: 18px;
+  outline: none;
+  font-family: 'Almendra', serif;
+  font-weight: bold;
+}
+
+.unavaliable {
+  background-color: rgb(190, 190, 190);
+  box-shadow: 0 0 0 black;
+}
+
+.reviews {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.review {
+  margin: 5px 0px;
+}
+
+.review-title {
+  text-align: center;
+  font-size: 28px;
+}
+
+.username, .user-rating {
+  display: inline-block;
+  margin: 0 15px;
+}
+
+.user-rating {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.review .time {
+  margin: 5px 15px;
+}
+
+.comment {
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  font-family: 'Fuzzy Bubbles', cursive;
+  padding-left: 35px;
+  text-shadow:
+    0px 0px 15px rgb(83, 0, 0),
+    2px 2px 15px rgb(151, 30, 30),
+    2px -2px 15px rgb(151, 30, 30),
+    -2px -2px 15px rgb(151, 30, 30),
+    -2px 2px 15px rgb(151, 30, 30);
 }
 
 .hidden {

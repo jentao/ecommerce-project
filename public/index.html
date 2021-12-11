@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="products.css">
     <link rel="stylesheet" href="item.css">
+    <link rel="stylesheet" href="login.css">
     <link href="https://fonts.googleapis.com/css2?family=Almendra&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&display=swap" rel="stylesheet">
     <script src="index.js"></script>
     <script src="item.js"></script>
     <title>Dark Souls Shop</title>
@@ -25,6 +27,8 @@
       <ul id='navbar'>
         <li id="home-btn">Home</li>
         <li id="orders-btn">Orders</li>
+        <li id="logout-btn" style="float:right">Logout</li>
+        <li id="login-btn" style="float:right">Login</li>
       </ul>
     </section>
 
@@ -68,20 +72,74 @@
       </section>
 
       <section class='itemview'>
-        <img
-          class="item-img"
-          src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850"
-          alt="Divine Blessing">
-        <section>
-          <p class="item-name">Divine Blessing</p>
-          <p class="item-type">Consumable</p>
-          <p class="item-price">Price: <span>100 souls</span></p>
-          <p class="item-desc">
-            Holy water blessed by the Queen of Lothric.
-            Fully restores HP and cures ailments.
-            The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.</p>
-          <button id="buy-btn">Buy</button>
+        <section class='iteminfo'>
+          <img
+            class="item-img"
+            src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850"
+            alt="Divine Blessing">
+          <section>
+            <p class="item-name">Divine Blessing</p>
+            <div class="rating">
+              <p class="rating-num">Rating: <b>4.5</b></p>
+              <div class="token"></div>
+              <div class="token"></div>
+              <div class="token"></div>
+              <div class="token"></div>
+              <div class="token hidden"></div>
+            </div>
+            <p class="item-type">Consumable</p>
+            <p class="item-price">Price: <span>100 souls</span></p>
+            <p class="item-desc">
+              Holy water blessed by the Queen of Lothric.
+              Fully restores HP and cures ailments.
+              The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.</p>
+            <button id="buy-btn" class="buy-btn">Purchase</button>
+          </section>
         </section>
+        <section class="reviews">
+          <p class="review-title">Reviews</p>
+          <div class="review">
+            <p class="username">DIO</p>
+            <p class="user-rating">5.0</p>
+            <p class="time">12/10/2021, 7:41:17 PM</p>
+            <p class="comment">Best daggers that I have ever bought.</p>
+          </div>
+          <div class="review">
+            <p class="username">DIO</p>
+            <p class="user-rating">5.0</p>
+            <p class="time">12/10/2021, 7:41:17 PM</p>
+            <p class="comment">Best daggers that I have ever bought.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="confirm-view"></section>
+
+      <section class="order-view">
+
+      </section>
+
+      <section class="login-view">
+        <header>
+          <h1>Login or Register</h1>
+        </header>
+        <form class="login-form">
+          <label for='email'>Email</label>
+          <input type='email' id='email' name='email' required>
+          <label for='passcode'>Password</label>
+          <input type='text' id='passcode' name='passcode' required>
+          <button>Login</button>
+        </form>
+
+        <form class="newuser-form">
+          <label for='email'>Email</label>
+          <input type='email' id='email' name='email' required>
+          <label for='username'>User Name</label>
+          <input type='text' id='username' name='username' required>
+          <label for='passcode'>Password</label>
+          <input type='text' id='passcode' name='passcode' required>
+          <button>Register</button>
+        </form>
       </section>
     </section>
   </body>
