@@ -1,132 +1,265 @@
-### Yipper API Documentation
-The Yipper API provides endpoints to retrieve, update and insert functionalities for the yipper database.
+# DarksoulsShop API Documentation
+The DarksoulsShop API provides methods for the user to retrieve data from the API
 
-#### Endpoint 1: Get all yip data or yip data matching a given search term
-**Request Format:** `/yipper/yips`\
-**Query Parameters:** `search` (optional)\
-**Request Type (both requests):** `GET`\
-**Returned Data Format:** JSON\
-**Description 1:** If the `search` parameter is not included in the request, get the `id`, `name`, `yip`, `hashtag`, `likes` and `date` from the `yips` table and outputs JSON containing the information in the order of `date`s in descending order.\
-**Example Request 1:** `/yipper/yips`\
+## Endpoint 1: Get all the items data or items data matching a given search term (name/desc/type)
+**Request Format:** `/darksouls/items`
+
+**Query Parameters:** `name` (optional), `desc` (optional), `type` (optional)
+
+**Request Type (all requests):** `GET`
+
+**Returned Data Format:** JSON
+
+**Description 1:** If any of the parameter is not included that that category won't be searched by the endpoint.
+
+**Example Request 1:** `/darksouls/items`
+
 **Example Output 1:** (abbreviated)
 ```json
 {
-  "yips":[
-    {
-      "id": 25,
-      "name": "Mister Fluffers",
-      "yip": "It is sooooo fluffy I am gonna die",
-      "hashtag": "fluff",
-      "likes": 6,
-      "date": "2020-07-07 03:48:28"
-    },
-    {
-      "id": 24,
-      "name": "Sir Barks a Lot",
-      "yip": "Imagine if my name was sir barks a lot and I was meowing all day haha",
-      "hashtag": "clown",
-      "likes": 6,
-      "date": "2020-07-06 00:55:08"
-    },
-    ...
-  ]
+		"itemid": 2,
+		"itemName": "Dragonslayer Greatbow",
+		"imagePath": "https://static.wikia.nocookie.net/darksouls/images/9/94/Dragonslayer_Greatbow_%28DSIII%29.png/revision/latest?cb=20160613022347",
+		"lore": "Greatbow used by the Dragonslayers during the age of gods. Far greater in size than any normal bow, and far more devastating.\r\nThe bow must be anchored to the ground when fired, a time-consuming operation that leaves the user vulnerable. Only specialized great arrows can be fired from the bow.",
+		"price": 6999,
+		"capacity": 8,
 }
 ```
-**Description 2:** If the `search` parameter is included in the request, respond with all the `id`s of the `yip`s matching the term passed in the `search` query parameter (ordered by the `id`s). A "match" would be any `yip` that has the `search` term in _any_ position meaning that the term "if" should match any  `yip` containing the words "if", "iframe" or "sniff".\
-**Example Request 2:** `/yipper/yips?search=if`\
-**Example Output 2:**
+
+**Error Handling:**
+- Possible 500 (SERVER_ERROR)
+ - If something went wrong on the server: `An error occurred on the server. Try again later.`
+
+## Endpoint 2:  Logs the user into the webservice, setting a login cookie that expires in 3 hours.
+**Request Format:** `/darksouls/login`
+
+**Query Parameters:** email, passcode.
+
+**Request Type:** `POST`
+
+**Returned Data Format:** TEXT, Cookie
+
+**Description:** Logs the user into the webservice, setting a login cookie that expires in 3 hours.
+**Example Request:** `/darksouls/login`
+**Example Output:**
+```TEXT
+'Successfully logged in!'
+```
+**Error Handling:**
+- Possible 400 (invalid request)
+ - If missing params: `'Missing required parameters username and password!'`
+- Possible 500 (Server Error)
+ - If something went wrong on the server: `An error occurred on the server. Try again later.`
+
+## Endpoint 3: Logs a user out by expiring their cookie.
+**Request Format:** `/darksouls/logout`
+**Body Parameters:** `sessionid`
+**Request Type:** `POST`
+**Returned Data Format:** `cookie`
+**Description:** Logs a user out by expiring their cookie.
+**Example Request:** `/darksouls/logout`
+**Example Output:**
+```
+Successfully logged out!
+```
+**Or id the user is already logged out:**
+```
+Already logged out.
+```
+
+#### Endpoint 4: Get information of a specific item
+**Request Format:** `/darksouls/item/:id`
+
+**Parameters:** `id`
+
+**Request Type:** `get`
+
+**Returned Data Format:** JSON
+
+**Description:** return the json of a specific item base on the itemid provided.
+
+**Example Request:** `/darksouls/item/1`
+**Example Output:**
 ```json
 {
-  "yips" : [
-    {
-      "id": 8
-    },
-    {
-      "id": 24
-    }
-  ]
+	"itemid": 1,
+	"itemName": "Brigand Twindaggers",
+	"imagePath": "https://static.wikia.nocookie.net/darksouls/images/f/f3/Brigand_Twindaggers.png/revision/latest?cb=20160613015635",
+	"lore": "These paired daggers are the preferred weapons of the brigands of a distant land.\r\nWhen two-handed, the wielder holds a blade in each hand, allowing for divergent attacks that include left handed moves.",
+	"price": 8999,
+	"capacity": 0,
+	"itemType": "melee"
 }
 ```
 **Error Handling:**
-- Possible 500 (server error) errors (all plain text):
-  - If something went wrong on the server, returns an error with the message: `An error occurred on the server. Try again later.`
+- Possible 400 (invalid request)
+ - If the id given does not exist: `Yikes. ID does not exist.`
+- Possible 500 (Server Error)
+ - If something went wrong on the server: `An error occurred on the server. Try again later.`
 
-#### Endpoint 2: Get yip data for a designated user
-**Request Format:** `/yipper/user/:user`\
-**Query Parameters:** none.\
-**Request Type:** `GET`\
-**Returned Data Format:** JSON\
-**Description:** Get the `name`, `yip`, `hashtag` and `date` for all the yips for a designated `user` ordered by the `date` in descending order. The `user` will be taken exactly as passed in the request.\
-**Example Request:** `/yipper/user/Chewbarka`\
+#### Endpoint 5: Process a purchase of an item
+**Request Format:** `/darksouls/buy`
+
+**Body Parameters:** `sessionid`, `itemid`
+
+**Request Type:** `POST`
+
+**Returned Data Format:** TEXT
+
+**Description:** return the order number if the purchese is succesful.
+
+**Example Request:** `/darksouls/buy`
+**Example Output:**
+```TEXT
+64
+```
+**Error Handling:**
+- Possible 400 (invalid request)
+  - If missing params: `Missing one or more of the required params.`
+  - If sessionid not exist: `User not logged in.`
+  - If itemid not exist: `itemid does not exist`
+  - If item out of stock: `Item out of stock`
+- Possible 500 (Server Error)
+  - If something went wrong on the server: `An error occurred on the server. Try again later.`
+
+#### Endpoint 6: Get transaction history for the user
+**Request Format:** `/darksouls/history`
+
+**Body Parameters:** `sessionid`
+
+**Request Type:** `POST`
+
+**Returned Data Format:** json
+
+**Description:** return all the orders from a specific user in json format.
+
+**Example Request:** `/darksouls/history`
 **Example Output:**
 ```json
 [
-  {
-    "name": "Chewbarka",
-    "yip": "chewy or soft cookies. I chew them all",
-    "hashtag": "largebrain",
-    "date": "2020-07-09 22:26:38",
-  },
-  {
-    "name": "Chewbarka",
-    "yip": "Every snack you make every meal you bake every bite you take... I will be watching you.",
-    "hashtag": "foodie",
-    "date": "2019-06-28 23:22:21"
-  }
+	{
+		"orderid": 10,
+		"userid": 1,
+		"itemid": 6,
+		"orderDate": "2021-12-10 21:22:40"
+	},
+	{
+		"orderid": 9,
+		"userid": 1,
+		"itemid": 6,
+		"orderDate": "2021-12-10 21:21:58"
+	},
+	{
+		"orderid": 8,
+		"userid": 1,
+		"itemid": 6,
+		"orderDate": "2021-12-10 21:20:22"
+	},
+	{
+		"orderid": 2,
+		"userid": 1,
+		"itemid": 1,
+		"orderDate": "2021-12-10 20:42:57"
+	},
+	{
+		"orderid": 1,
+		"userid": 1,
+		"itemid": 1,
+		"orderDate": "2021-12-10 20:41:17"
+	}
 ]
 ```
 **Error Handling:**
-- Possible 400 (invalid request) errors (all plain text):
-  - If the user parameter does not exist in database, returns an error with the message: `Yikes. User does not exist.`
-- Possible 500 (server error) errors (all plain text):
-  - If something went wrong on the server, returns an error with the message: `An error occurred on the server. Try again later.`
+- Possible 400 (invalid request)
+  - If sessionid not exist: `User not logged in.`
+- Possible 500 (Server Error)
+  - If something went wrong on the server: `An error occurred on the server. Try again later.`
 
+#### Endpoint 7: Adds a new rating for a product
+**Request Format:** `/darksouls/rate`
 
-#### Endpoint 3: Update the likes for a designated yip
-**Request Format:** `/yipper/likes`\
-**Body Parameters:** `id`\
-**Request Type:** `POST`\
-**Returned Data Format:** plain text\
-**Description:** Update the `likes` for a yip (the yip is updating is determined by the `id` passed through the body) by incrementing the current value by 1 and responding with the new value.\
-**Example Request:** `/yipper/likes`\
+**Body Parameters:** `sessionid`, `itemid`, `stars`, `comment`(optional)
+
+**Request Type:** `POST`
+
+**Returned Data Format:** TEXT
+
+**Description:** return `rate success` if successfully rated the item.
+
+**Example Request:** `/darksouls/rate`
 **Example Output:**
-```
-8
+```TEXT
+rate success
 ```
 **Error Handling:**
-- Possible 400 (invalid request) errors (all plain text):
-  - If the provided id does not exist in database, returns an error with the message: `Yikes. ID does not exist.`
-  - If one or more parameters are not provided, returns an error with the message: `Missing one or more of the required params.`
-- Possible 500 (server error) errors (all plain text):
-  - If something went wrong on the server, returns an error with the message: `An error occurred on the server. Try again later.`
+- Possible 400 (invalid request)
+  - If missing params: `Invalid Params.`
+- Possible 500 (Server Error)
+  - If something went wrong on the server: `An error occurred on the server. Try again later.`
 
-#### Endpoint 4: Add a new yip
-**Request Format:** `/yipper/new`\
-**Body Parameters:** `name` and `full`\
-**Request Type:** `POST`\
-**Returned Data Format:** JSON\
-**Description:** Add the new Yip information to the database and send back and output the JSON with the `id`, `name`, `yip`, `hashtag`, `likes` and `date`. The `id` should correspond with the auto-incremented `id` generated from inserting into the database. The `name` of the is grabbed from the `name` body parameter. The `likes` will be set to 0, and the `yip` and `hashtag` information will be obtained from the `full` body parameter. The `date` should be the current date.\
-A valid full yip is described below:
-* The text of a Yip can be made up of any combination of any word character (letter, number, underscore), any whitespace character, a period (`.`), an exclamation point (`!`) and/or a question mark (`?`). At _minimum_ the Yip text should be a single one of the characters mentioned above but there is no restriction on how long the text of a Yip can be.
-* The text of a Yip should be separated by a single whitespace character and then a pound sign (`#`).
-* Following the pound sign (`#`) is the hashtag which is is any combination of one or more of lowercase letters, capital letters and/or numbers.
+#### Endpoint 8: get all the ratings and the average stars of the specified items
+**Request Format:** `/darksouls/ratings/:id`
 
-**Example Request:** `/yipper/new`\
+**Body Parameters:** `id`
+
+**Request Type:** `GET`
+
+**Returned Data Format:** json
+
+**Description:** Will return all the reviews of a specific product and its average rating in a json.
+
+**Example Request:** `/darksouls/ratings/1`
 **Example Output:**
 ```json
 {
-  "id": 528,
-  "name": "Chewbarka",
-  "yip": "love to yip allllll day long",
-  "hashtag": "coolkids",
-  "likes": 0,
-  "date": "2020-09-09 18:16:18"
+	"ratings": [
+		{
+			"ratingid": 3,
+			"userid": 1,
+			"itemid": 1,
+			"ratingDate": "2021-12-10 22:57:47",
+			"stars": 4,
+			"comment": "second buy, overall quality is still solid but the price is a bit expensive."
+		},
+		{
+			"ratingid": 1,
+			"userid": 1,
+			"itemid": 1,
+			"ratingDate": "2021-12-10 22:31:16",
+			"stars": 5,
+			"comment": "Solid Daggers, will definitely buy another! "
+		}
+	],
+	"avg": {
+		"avg(stars)": 4.5
+	}
 }
 ```
 **Error Handling:**
-- Possible 400 (invalid request) errors (all plain text):
-  - If the provided user does not exist in database, returns an error with the message: `Yikes. User does not exist.`
-  - If the provided full yip is not in valid format, returns an error with the message: `Yikes. Yip format is invalid.`
-  - If one or more parameters are not provided, returns an error with the message: `Missing one or more of the required params.`
-- Possible 500 (server error) errors (all plain text):
-  - If something went wrong on the server, returns an error with the message: `An error occurred on the server. Try again later.`
+- Possible 400 (invalid request)
+  - If itemid does not exist: `itemid does not exist`
+- Possible 500 (Server Error)
+  - If something went wrong on the server: `An error occurred on the server. Try again later.`
+
+#### Endpoint 9: Add a new new user
+**Request Format:** `/darksouls/newuser`
+
+**Body Parameters:** `email`, `passcode`, `username`
+
+**Request Type:** `POST`
+
+**Returned Data Format:** text
+
+**Description:** Will register a new user and enter it in the database if the email address in not already registered.
+
+**Example Request:** `/darksouls/newuser`
+**Example Output:**
+```text
+registered
+```
+**Error Handling:**
+- Possible 400 (invalid request)
+  - If missing params: `Missing one or more of the required params`
+  - if email already registered: `Email already exist.`
+- Possible 500 (Server Error)
+  - If something went wrong on the server: `An error occurred on the server. Try again later.`

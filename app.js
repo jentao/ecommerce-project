@@ -12,7 +12,7 @@ const PORT_NUM = 8000;
 const CLIENT_ERROR = 400;
 const SERVER_ERROR = 500;
 const SERVER_ERROR_MSG = "An error occurred on the server. Try again later.";
-const COOKIE_EXPIRATION = 1000 * 60 * 60 * 3;
+const COOKIE_EXPIRATION = 10800000;
 
 const express = require("express");
 const app = express();
@@ -49,13 +49,15 @@ app.get('/darksouls/items', async function(req, res) {
     res.status(CLIENT_ERROR).send('Invalid type');
   } else {
     try {
-      let items;
+      name = '%' + name + '%';
+      desc = '%' + desc + '%';
+      type = '%' + type + '%';
       let db = await getDBConnection();
-      let qry = 'SELECT * FROM items WHERE itemName LIKE \'%' + name + '%\' ' +
-      'AND lore LIKE \'%' + desc + '%\' ' +
-      'AND itemType LIKE \'%' + type + '%\' ' +
+      let qry = 'SELECT * FROM items WHERE itemName LIKE ? ' +
+      'AND lore LIKE ? ' +
+      'AND itemType LIKE ? ' +
       ' ORDER BY itemid;';
-      items = await db.all(qry);
+      let items = await db.all(qry, [name, desc, type]);
       await db.close();
       res.json(items);
     } catch (err) {
@@ -69,7 +71,7 @@ app.get('/darksouls/items', async function(req, res) {
 app.post('/darksouls/login', async function(req, res) {
   res.type('text');
   let email = req.body.email;
-  let pass = req.body.password;
+  let pass = req.body.passcode;
   if (!email || !pass) {
     res.status(CLIENT_ERROR).send('Missing required parameters username and password!');
   } else {
@@ -108,7 +110,7 @@ app.get('/darksouls/item/:id', async function(req, res) {
   try {
     let db = await getDBConnection();
     let q1 = 'SELECT * FROM items WHERE itemid = ? ;';
-    let items = await db.all(q1, [id]);
+    let items = await db.get(q1, [id]);
     await db.close();
     if (items.length === 0) {
       res.type('text');
@@ -174,7 +176,7 @@ app.post("/darksouls/history", async function(req, res) {
     }
   } else {
     res.type('text');
-    res.status(CLIENT_ERROR).send("Missing one or more of the required params.");
+    res.status(CLIENT_ERROR).send("User not logged in.");
   }
 });
 
@@ -184,7 +186,8 @@ app.post("/darksouls/history", async function(req, res) {
 app.post("/darksouls/rate", async function(req, res) {
   // let sessionid = req.cookies['sessionid'];
   let sessionid = 3;
-  if (sessionid && req.body.id && req.body.stars && req.body.stars <= 5 && req.body.stars >= 1) {
+  const max = 5;
+  if (sessionid && req.body.id && req.body.stars && req.body.stars <= max && req.body.stars >= 1) {
     try {
       let db = await getDBConnection();
       let itemid = req.body.id;
@@ -195,7 +198,7 @@ app.post("/darksouls/rate", async function(req, res) {
       let q2 = 'INSERT INTO ratings (userid,itemid,comment,stars) VALUES( ?, ?, ?, ? );';
       await db.run(q2, [user.userid, itemid, comment, stars]);
       res.type('text');
-      res.send('succeed');
+      res.send('rate success');
     } catch (err) {
       res.type('text');
       res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
@@ -211,17 +214,23 @@ app.post("/darksouls/rate", async function(req, res) {
  */
 app.get('/darksouls/ratings/:id', async function(req, res) {
   let itemid = req.params.id;
-  try {
-    let db = await getDBConnection();
-    let q1 = 'SELECT * FROM ratings WHERE itemid = ? ORDER BY DATETIME(ratingdate) DESC;';
-    let ratings = await db.all(q1, [itemid]);
-    let q2 = 'SELECT avg(stars) FROM ratings WHERE itemid = ? ;';
-    let avg = await db.get(q2, [itemid]);
-    await db.close();
-    res.json({ratings, avg});
-  } catch (err) {
+  let isValid = await checkid(itemid);
+  if (!isValid) {
     res.type('text');
-    res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    res.status(CLIENT_ERROR).send('itemid does not exist');
+  } else {
+    try {
+      let db = await getDBConnection();
+      let q1 = 'SELECT * FROM ratings WHERE itemid = ? ORDER BY DATETIME(ratingdate) DESC;';
+      let ratings = await db.all(q1, [itemid]);
+      let q2 = 'SELECT avg(stars) FROM ratings WHERE itemid = ? ;';
+      let avg = await db.get(q2, [itemid]);
+      await db.close();
+      res.json({ratings, avg});
+    } catch (err) {
+      res.type('text');
+      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+    }
   }
 });
 
@@ -307,7 +316,7 @@ async function setSessionId(id, email) {
 }
 
 /**
- * Checks is itemid exist in items
+ * Checks if itemid exist in items
  * @param {string} itemid - The id to check
  * @returns {boolean} - True if the itemid exist in items, false otherwise.
  */
