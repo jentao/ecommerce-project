@@ -165,7 +165,7 @@ app.post("/darksouls/history", async function(req, res) {
       let db = await getDBConnection();
       let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
       let user = await db.get(q1, [sessionid]);
-      let q2 = 'SELECT * FROM orders WHERE userid = ? ;';
+      let q2 = 'SELECT * FROM orders WHERE userid = ? ORDER BY DATETIME(orderdate) DESC;';
       let orders = await db.all(q2, [user.userid]);
       res.json(orders);
     } catch (err) {
@@ -213,7 +213,7 @@ app.get('/darksouls/ratings/:id', async function(req, res) {
   let itemid = req.params.id;
   try {
     let db = await getDBConnection();
-    let q1 = 'SELECT * FROM ratings WHERE itemid = ? ;';
+    let q1 = 'SELECT * FROM ratings WHERE itemid = ? ORDER BY DATETIME(ratingdate) DESC;';
     let ratings = await db.all(q1, [itemid]);
     let q2 = 'SELECT avg(stars) FROM ratings WHERE itemid = ? ;';
     let avg = await db.get(q2, [itemid]);
