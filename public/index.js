@@ -21,6 +21,63 @@
     id("logout-btn").addEventListener("click", logout);
     id("home-btn").addEventListener("click", showHome);
     initForms();
+    id("switch").addEventListener("click", toggleView);
+    id("filter-type").addEventListener("change", filterItems);
+    id("search-btn").addEventListener("click", search);
+  }
+
+  /**
+   * Filter the Itemss on the homepage based on the input from search bar
+   */
+  function search() {
+    let tvalue = id("search-mode").value;
+    let keyword = id("search-term").value.trim();
+    let url = "/darksouls/items/?" + tvalue + "=" + keyword;
+    id("search-term").value = "";
+    getRequest(url, populateProducts);
+  }
+
+  /**
+   * Filters the home page items based on their stock status
+   */
+  function filterItems() {
+    let fvalue = id("filter-type").value;
+    let hitems = [];
+    let items = [];
+    let items2 = [];
+    if (fvalue === "outofstock") {
+      hitems = qsa(".in-stock");
+      items = qsa(".out-of-stock");
+    } else if (fvalue === "instock") {
+      items = qsa(".in-stock");
+      hitems = qsa(".out-of-stock");
+    } else {
+      items = qsa(".in-stock");
+      items2 = qsa(".out-of-stock");
+    }
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove("hidden");
+    }
+    for (let i = 0; i < items2.length; i++) {
+      items2[i].classList.remove("hidden");
+    }
+    for (let i = 0; i < hitems.length; i++) {
+      hitems[i].classList.add("hidden");
+    }
+  }
+
+  /**
+   * Toggles between grid and list view for home page
+   */
+  function toggleView() {
+    let isList = id("switch").checked;
+    if (!isList) {
+      qs(".products").classList.remove("list");
+      qs(".products").classList.add("grid");
+    } else {
+      qs(".products").classList.add("list");
+      qs(".products").classList.remove("grid");
+    }
   }
 
   /**
@@ -304,19 +361,18 @@
 
   /**
    * show item page with gien item id
-   * @param {string} id of the item to display
+   * @param {string} iid of the item to display
    */
-  function showItem(id) {
+  function showItem(iid) {
     checkUser();
-    toggleButton();
     qs(".login-view").classList.add("hidden");
     qs(".home").classList.add("hidden");
     qs(".itemview").classList.remove("hidden");
     qs(".confirm-view").classList.add("hidden");
     qs(".order-view").classList.add("hidden");
     qs(".error-view").classList.add("hidden");
-    let itemurl = "/darksouls/item/" + id;
-    let reviewurl = "/darksouls/ratings/" + id;
+    let itemurl = "/darksouls/item/" + iid;
+    let reviewurl = "/darksouls/ratings/" + iid;
     getRequest(itemurl, buildItem);
     getRequest(reviewurl, buildReviews);
   }
@@ -348,7 +404,7 @@
     let newBtn = oldBtn.cloneNode(true);
     newBtn.disabled = (data.capacity === 0);
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-    toggleButton(data.capacity !== 0);
+    toggleButton(data.capacity !== 0, data.itemid);
     container.appendChild(body);
   }
 
@@ -376,7 +432,7 @@
     container.classList.add("review");
     let name = gen("p");
     name.classList.add("username");
-    name.textContent = "data.username";
+    name.textContent = data.username;
     let rating = gen("p");
     rating.classList.add("user-rating");
     rating.textContent = data.stars;
@@ -451,11 +507,21 @@
     if (inStock) {
       btn.disabled = false;
       btn.textContent = "Purchase";
-      btn.addEventListener("click", () => purchase(iid));
+      btn.addEventListener("click", () => confirm(iid));
     } else {
       btn.disabled = true;
       btn.textContent = "Currently Unavailable";
     }
+  }
+
+  /**
+   * confirm before purchase an item
+   * @param {string} iid tid of the item
+   */
+  function confirm(iid) {
+    let btn = id("buy-btn");
+    btn.textContent = "Confirm";
+    btn.addEventListener("click", () => purchase(iid));
   }
 
   /**
@@ -466,7 +532,6 @@
     let url = "/darksouls/buy";
     let data = new FormData();
     data.append("itemid", iid);
-    console.log(data);
     postRequest(url, data, (num) => showConfirm(num), false);
   }
 
