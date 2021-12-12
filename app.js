@@ -145,6 +145,7 @@ app.post("/darksouls/buy", async function(req, res) {
         res.status(CLIENT_ERROR).send('User does not have enough souls.');
       } else {
         await db.close();
+        console.log('hi');
         let oid = await order(itemid, item, user);
         res.type('text');
         res.send(oid);
@@ -225,7 +226,8 @@ app.get('/darksouls/ratings/:id', async function(req, res) {
   } else {
     try {
       let db = await getDBConnection();
-      let q1 = 'SELECT * FROM ratings WHERE itemid = ? ORDER BY DATETIME(ratingdate) DESC;';
+      let q1 = 'SELECT u.username, r.ratingDate, r.stars, r.comment FROM ratings r, users u ' +
+      'WHERE r.itemid = ? AND r.userid = u.userid ORDER BY DATETIME(r.ratingdate) DESC;';
       let ratings = await db.all(q1, [itemid]);
       let q2 = 'SELECT avg(stars) FROM ratings WHERE itemid = ? ;';
       let avg = await db.get(q2, [itemid]);
@@ -233,7 +235,7 @@ app.get('/darksouls/ratings/:id', async function(req, res) {
       res.json({ratings, avg});
     } catch (err) {
       res.type('text');
-      res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
+      res.status(SERVER_ERROR).send(err);
     }
   }
 });
@@ -355,7 +357,7 @@ async function checkUser(sessionid) {
 async function checkBuy(itemid, sessionid, capacity) {
   if (!itemid) {
     return ("Missing one or more of the required params.");
-  } else if (!checkUser(sessionid)) {
+  } else if (!(await checkUser(sessionid))) {
     return ("User not logged in.");
   } else if (!(await checkid(itemid))) {
     return ("itemid does not exist");
