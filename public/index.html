@@ -19,18 +19,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Almendra&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&display=swap" rel="stylesheet">
     <script src="index.js"></script>
-    <script src="item.js"></script>
     <title>Dark Souls Shop</title>
   </head>
 
   <body>
     <img id="title" src="imgs/ds_logo.png" alt="darksouls logo">
     <section>
-      <ul id='navbar'>
-        <li id="home-btn">Home</li>
-        <li id="orders-btn">Orders</li>
-        <li id="logout-btn" style="float:right">Logout</li>
-        <li id="login-btn" style="float:right">Login</li>
+      <ul class='navbar'>
+        <li id="home-btn" class="nav-btn">Home</li>
+        <li id="orders-btn" class="nav-btn">Orders</li>
+        <li id="logout-btn" class="nav-btn" style="float:right">Logout</li>
+        <li id="login-btn" class="nav-btn" style="float:right">Login</li>
       </ul>
     </section>
 
@@ -52,41 +51,28 @@
             <option value="outofstock">Out of Stock</option>
           </select>
         </div>
-        <section class='products'>
+        <section class='products grid'>
           <article class='product'>
             <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
+            <div class="item-info">
+              <h3>Divine Blessing</h3>
+              <p class='price'>64999 souls</p>
+              <p class="item-desc">Holy water blessed by the Queen of Lothric.
+                Fully restores HP and cures ailments.
+                The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.
+              </p>
+            </div>
           </article>
           <article class='product'>
             <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
-          </article>
-          <article class='product'>
-            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
-          </article>
-          <article class='product'>
-            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
-          </article>
-          <article class='product'>
-            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
-          </article>
-          <article class='product'>
-            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
-          </article>
-          <article class='product'>
-            <img class='productimg' src="https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850" alt='Exile Great Sword'>
-            <h3>Divine Blessing</h3>
-            <p class='price'>64999 souls</p>
+            <div class="item-info">
+              <h3>Divine Blessing</h3>
+              <p class='price'>64999 souls</p>
+              <p class="item-desc">Holy water blessed by the Queen of Lothric.
+                Fully restores HP and cures ailments.
+                The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.
+              </p>
+            </div>
           </article>
         </section>
       </section>
@@ -109,10 +95,10 @@
             </div>
             <p class="item-type">Consumable</p>
             <p class="item-price">Price: <span>100 souls</span></p>
-            <p class="item-desc">
-              Holy water blessed by the Queen of Lothric.
+            <p class="item-desc">Holy water blessed by the Queen of Lothric.
               Fully restores HP and cures ailments.
-              The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.</p>
+              The Queen of Lothric, married to the former King Oceiros, was initially revered as a goddess of fertility and bounty. After giving birth to Ocelotte, her youngest, she quietly disappeared.
+            </p>
             <button id="buy-btn" class="buy-btn">Purchase</button>
           </section>
         </section>
@@ -163,7 +149,7 @@
         <header>
           <h1>Login or Register</h1>
         </header>
-        <form class="login-form">
+        <form class="login-form" id="login-form">
           <label for='email'>Email</label>
           <input type='email' id='email' name='email' required>
           <label for='passcode'>Password</label>
@@ -171,7 +157,7 @@
           <button>Login</button>
         </form>
 
-        <form class="newuser-form">
+        <form class="newuser-form" id="newuser-form">
           <label for='email'>Email</label>
           <input type='email' id='email' name='email' required>
           <label for='username'>User Name</label>
@@ -180,6 +166,10 @@
           <input type='text' id='passcode' name='passcode' required>
           <button>Register</button>
         </form>
+      </section>
+
+      <section class="error-view">
+        <h2 id='error'>An error has occurred, please try again later!</h2>
       </section>
     </section>
   </body>

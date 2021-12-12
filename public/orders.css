@@ -14,7 +14,10 @@
 
 .order-view .order:hover {
   box-shadow: 0px 0px 5px grey;
-  margin: 0 5px;
+}
+
+.order-view .order {
+  margin: 5px 0;
 }
 
 .hidden {
