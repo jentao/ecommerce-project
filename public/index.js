@@ -18,6 +18,7 @@
     showHome();
     id("orders-btn").addEventListener("click", showOrders);
     id("login-btn").addEventListener("click", showLogin);
+    id("logout-btn").addEventListener("click", logout);
     id("home-btn").addEventListener("click", showHome);
     let cards = qsa(".product");
     for (let i = 0; i < cards.length; i++) {
@@ -50,7 +51,14 @@
    */
   function login() {
     const switchTime = 2000;
-    checkUser();
+    setTimeout(showHome, switchTime);
+  }
+
+  /**
+   * update the website with the user's information
+   */
+  function logout() {
+    const switchTime = 2000;
     setTimeout(showHome, switchTime);
   }
 

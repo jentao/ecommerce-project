@@ -129,8 +129,7 @@ app.get('/darksouls/item/:id', async function(req, res) {
  * Process a purchase of an item
  */
 app.post("/darksouls/buy", async function(req, res) {
-  // let sessionid = req.cookies['sessionid'];
-  let sessionid = 3;
+  let sessionid = req.cookies['sessionid'];
   try {
     let db = await getDBConnection();
     let itemid = req.body.id;
@@ -162,8 +161,7 @@ app.post("/darksouls/buy", async function(req, res) {
  * Get transaction history for the user
  */
 app.post("/darksouls/history", async function(req, res) {
-  // let sessionid = req.cookies['sessionid'];
-  let sessionid = 3;
+  let sessionid = req.cookies['sessionid'];
   if (sessionid) {
     try {
       let db = await getDBConnection();
@@ -186,8 +184,7 @@ app.post("/darksouls/history", async function(req, res) {
  * Adds a new rating for a product
  */
 app.post("/darksouls/rate", async function(req, res) {
-  // let sessionid = req.cookies['sessionid'];
-  let sessionid = 3;
+  let sessionid = req.cookies['sessionid'];
   if (sessionid && req.body.id && req.body.stars && req.body.stars <= max && req.body.stars >= 1 &&
     req.body.orderid) {
     try {
