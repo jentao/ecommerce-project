@@ -26,7 +26,6 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 
 const cookieParser = require("cookie-parser");
-const { disabled } = require("express/lib/application");
 app.use(cookieParser());
 
 const types = ['melee', 'ranged', 'consumable', 'miracle', 'pyromancy', 'sorcery'];
