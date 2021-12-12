@@ -1,10 +1,11 @@
 /*
- * Jennifer Tao
+ * Jennifer Tao, Eric Yu
  * 12 03 2021
  * Section AE, Tim Mandzyuk, Nikola Bojanic
  *
- * This is the JS to implement the UI for my data structures.
- * It implements the push, pop, and peek functions for stack and queue.
+ * This is the JS to implement the behavior for my eCommerce site.
+ * It implements the feature to send and retrieve information from the API.
+ * And it also implements features like toggle items view and filter items.
  */
 "use strict";
 (function() {
@@ -33,7 +34,6 @@
     let tvalue = id("search-mode").value;
     let keyword = id("search-term").value.trim();
     let url = "/darksouls/items/?" + tvalue + "=" + keyword;
-    id("search-term").value = "";
     getRequest(url, populateProducts);
   }
 
@@ -166,6 +166,7 @@
     for (let i = 0; i < data.length; i++) {
       container.appendChild(buildProduct(data[i]));
     }
+    filterItems();
   }
 
   /**

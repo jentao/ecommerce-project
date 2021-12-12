@@ -1,11 +1,10 @@
 /*
-  Jennifer Tao
+  Jennifer Tao, Eric Yu
   12 03 2021
   Section AE, Tim Mandzyuk, Nikola Bojanic
 
-  This is the structures.css page for my data structue page.
-  It seperate the stack and queue section by color, and
-  includes styles for elements in each data structure.
+  This is the styles for the item page for the website.
+  It styles information for the item and the reviews for this item.
 */
 .iteminfo {
   width: 80%;
@@ -107,8 +106,4 @@
     2px -2px 15px rgb(151, 30, 30),
     -2px -2px 15px rgb(151, 30, 30),
     -2px 2px 15px rgb(151, 30, 30);
-}
-
-.hidden {
-  display: none;
 }

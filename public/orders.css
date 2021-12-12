@@ -1,3 +1,12 @@
+/*
+  Jennifer Tao, Eric Yu
+  12 03 2021
+  Section AE, Tim Mandzyuk, Nikola Bojanic
+
+  This is the styles for the orders page.
+  It styles the orders cards and review forms.
+  It uses a similar style of the list view of home page.
+*/
 .order-view h2 {
   text-align: center;
   font-size: 2em;

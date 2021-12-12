@@ -6,6 +6,8 @@
  * This is the JS to implement the Dark Souls Shop API.
  * It implements the end points that retrieves data from database,
  * filters items by type, handles user login requests
+ *
+ * All images of items come from https://darksouls.fandom.com/wiki/Dark_Souls_Wiki
  */
 'use strict';
 const PORT_NUM = 8000;

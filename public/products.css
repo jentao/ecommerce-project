@@ -1,3 +1,12 @@
+/*
+  Jennifer Tao, Eric Yu
+  12 03 2021
+  Section AE, Tim Mandzyuk, Nikola Bojanic
+
+  This is the styles for the items section of the home page.
+  It styles the search bar and all the item cards.
+  It also contains styles for the grid and list view.
+*/
 .products .productimg {
   width: 250px;
 }
@@ -141,8 +150,4 @@
 #filter-type {
   float: right;
   margin-right: 0;
-}
-
-.hidden {
-  display: none;
 }

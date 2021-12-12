@@ -1,3 +1,11 @@
+/*
+  Jennifer Tao, Eric Yu
+  12 03 2021
+  Section AE, Tim Mandzyuk, Nikola Bojanic
+
+  This is the styles for the all page and nav bar for the website.
+  It uses black and orange theme.
+*/
 body {
   background-color: rgb(0, 0, 0);
   color: white;
@@ -42,8 +50,4 @@ p {
 
 .error-view {
   text-align: center;
-}
-
-.hidden {
-  display: none;
 }
