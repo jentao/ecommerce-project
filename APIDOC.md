@@ -145,34 +145,11 @@ Already logged out.
 ```json
 [
 	{
-		"orderid": 10,
-		"userid": 1,
-		"itemid": 6,
-		"orderDate": "2021-12-10 21:22:40"
-	},
-	{
-		"orderid": 9,
-		"userid": 1,
-		"itemid": 6,
-		"orderDate": "2021-12-10 21:21:58"
-	},
-	{
-		"orderid": 8,
-		"userid": 1,
-		"itemid": 6,
-		"orderDate": "2021-12-10 21:20:22"
-	},
-	{
-		"orderid": 2,
-		"userid": 1,
-		"itemid": 1,
-		"orderDate": "2021-12-10 20:42:57"
-	},
-	{
 		"orderid": 1,
 		"userid": 1,
 		"itemid": 1,
-		"orderDate": "2021-12-10 20:41:17"
+		"orderDate": "2021-12-10 20:41:17",
+		"rated": 1
 	}
 ]
 ```
