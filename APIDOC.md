@@ -33,7 +33,7 @@ The DarksoulsShop API provides methods for the user to retrieve data from the AP
 ## Endpoint 2:  Logs the user into the webservice, setting a login cookie that expires in 3 hours.
 **Request Format:** `/darksouls/login`
 
-**Query Parameters:** email, passcode.
+**Query Parameters:** `email, passcode, cookies`
 
 **Request Type:** `POST`
 
@@ -52,12 +52,19 @@ The DarksoulsShop API provides methods for the user to retrieve data from the AP
  - If something went wrong on the server: `An error occurred on the server. Try again later.`
 
 ## Endpoint 3: Logs a user out by expiring their cookie.
+
 **Request Format:** `/darksouls/logout`
-**Body Parameters:** `sessionid`
+
+**Body Parameters:** `cookies`
+
 **Request Type:** `POST`
+
 **Returned Data Format:** `cookie`
+
 **Description:** Logs a user out by expiring their cookie.
+
 **Example Request:** `/darksouls/logout`
+
 **Example Output:**
 ```
 Successfully logged out!

@@ -42,7 +42,7 @@
     qs("#newuser-form").addEventListener("submit", function(event) {
       event.preventDefault();
       let params = new FormData(this);
-      postRequest(newuser, params, login, false);
+      postRequest(newuser, params, () => register(params), false);
     });
   }
 
@@ -50,22 +50,33 @@
    * update the website with the user's information
    */
   function login() {
-    const switchTime = 2000;
-    setTimeout(showHome, switchTime);
+    showHome();
+  }
+
+  /**
+   * register the user and login
+   * @param {object} params user's register data
+   */
+  function register(params) {
+    const loginuser = "/darksouls/login";
+    postRequest(loginuser, params, login, false);
   }
 
   /**
    * update the website with the user's information
    */
   function logout() {
-    const switchTime = 2000;
-    setTimeout(showHome, switchTime);
+    let logouturl = "/darksouls/logout";
+    postRequest(logouturl, null, () => {
+      showHome();
+    }, false);
   }
 
   /**
    * checks if user is loged in, and initialize navbar accordingly
    */
   function checkUser() {
+    console.log(document.cookie);
     let sid = idFromCookie();
     if (sid) {
       id("orders-btn").classList.remove("hidden");
@@ -122,7 +133,7 @@
     }
 
     let img = gen("img");
-    img.src = "https://static.wikia.nocookie.net/darksouls/images/9/99/Divine_Blessing_%28DSIII%29.png/revision/latest?cb=20160613233850";
+    img.src = item.imagePath;
     img.alt = item.itemName;
     img.classList.add("productimg");
     container.appendChild(img);
