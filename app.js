@@ -26,9 +26,11 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 
 const cookieParser = require("cookie-parser");
+const { disabled } = require("express/lib/application");
 app.use(cookieParser());
 
 const types = ['melee', 'ranged', 'consumable', 'miracle', 'pyromancy', 'sorcery'];
+const max = 5;
 
 /**
  * Return all item types
@@ -186,19 +188,25 @@ app.post("/darksouls/history", async function(req, res) {
 app.post("/darksouls/rate", async function(req, res) {
   // let sessionid = req.cookies['sessionid'];
   let sessionid = 3;
-  const max = 5;
-  if (sessionid && req.body.id && req.body.stars && req.body.stars <= max && req.body.stars >= 1) {
+  if (sessionid && req.body.id && req.body.stars && req.body.stars <= max && req.body.stars >= 1 &&
+    req.body.orderid) {
     try {
       let db = await getDBConnection();
-      let itemid = req.body.id;
-      let stars = req.body.stars;
-      let comment = req.body.comment ? req.body.comment : "";
-      let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
-      let user = await db.get(q1, [sessionid]);
-      let q2 = 'INSERT INTO ratings (userid,itemid,comment,stars) VALUES( ?, ?, ?, ? );';
-      await db.run(q2, [user.userid, itemid, comment, stars]);
-      res.type('text');
-      res.send('rate success');
+      let q3 = 'SELECT rated FROM orders WHERE orderid = ? ;';
+      let rated = await db.get(q3, [req.body.orderid]);
+      if (rated.rated !== 0) {
+        res.type('text');
+        res.status(CLIENT_ERROR).send('Already commented');
+      } else {
+        let comment = req.body.comment ? req.body.comment : "";
+        let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
+        let user = await db.get(q1, [sessionid]);
+        let q2 = 'INSERT INTO ratings (userid,itemid,comment,stars) VALUES( ?, ?, ?, ? );';
+        await db.run(q2, [user.userid, req.body.id, comment, req.body.stars]);
+        let q4 = 'UPDATE orders SET rated=rated+1 WHERE orderid= ? ;';
+        db.run(q4, [req.body.orderid]);
+        res.send('rate success');
+      }
     } catch (err) {
       res.type('text');
       res.status(SERVER_ERROR).send(SERVER_ERROR_MSG);
@@ -374,8 +382,8 @@ async function order(itemid, item, user) {
   await db.run(q3, [itemid]);
   let q4 = 'UPDATE users SET balance=balance- ? WHERE userid= ? ;';
   await db.run(q4, [item.price, user.userid]);
-  let q5 = 'INSERT INTO orders (userid,itemid) VALUES( ?, ? );';
-  let insert = await db.run(q5, [user.userid, itemid]);
+  let q5 = 'INSERT INTO orders (userid,itemid,rated) VALUES( ?, ?, ? );';
+  let insert = await db.run(q5, [user.userid, itemid, 0]);
   let oid = insert['lastID'];
   await db.close();
   return oid.toString();

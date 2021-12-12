@@ -17,22 +17,23 @@
 --   sessionid TEXT
 -- );
 
--- CREATE TABLE orders (
---   orderid INTEGER PRIMARY KEY,
---   userid INTEGER,
---   itemid INTEGER,
---   orderDate DATE DEFAULT (datetime('now','localtime')),
---   foreign key (userid) references users(userid),
---   foreign key (itemid) references items(itemid)
--- );
-
-CREATE TABLE ratings (
-  ratingid INTEGER PRIMARY KEY,
+CREATE TABLE orders (
+  orderid INTEGER PRIMARY KEY,
   userid INTEGER,
   itemid INTEGER,
-  ratingDate DATE DEFAULT (datetime('now','localtime')),
-  stars INTEGER,
-  comment TEXT,
+  orderDate DATE DEFAULT (datetime('now','localtime')),
+  rated INTEGER,
   foreign key (userid) references users(userid),
   foreign key (itemid) references items(itemid)
 );
+
+-- CREATE TABLE ratings (
+--   ratingid INTEGER PRIMARY KEY,
+--   userid INTEGER,
+--   itemid INTEGER,
+--   ratingDate DATE DEFAULT (datetime('now','localtime')),
+--   stars INTEGER,
+--   comment TEXT,
+--   foreign key (userid) references users(userid),
+--   foreign key (itemid) references items(itemid)
+-- );
