@@ -231,12 +231,17 @@
 
     let body = gen("div");
     body.classList.add("order-info");
+    let oid = gen("p");
+    oid.textContent = "Order# " + order.orderid;
+
     let name = gen("p");
+    name.classList.add("name");
     let price = gen("p");
     price.classList.add("price");
     let time = gen("p");
     time.classList.add("time");
     time.textContent = (new Date(order.orderDate)).toLocaleString();
+    body.appendChild(oid);
     body.appendChild(name);
     body.appendChild(price);
     body.appendChild(time);
@@ -310,7 +315,7 @@
     img.src = item.imagePath;
     img.alt = item.itemName;
 
-    let name = container.querySelector("p");
+    let name = container.querySelector(".name");
     name.textContent = item.itemName;
     let price = container.querySelector(".price");
     price.textContent = item.price + " souls";
