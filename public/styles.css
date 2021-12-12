@@ -36,6 +36,10 @@ p {
   text-decoration: none;
 }
 
+.right {
+  float: right;
+}
+
 /* Change the link color to #111 (black) on hover */
 .nav-btn:hover {
   background-color: rgb(255, 155, 23);

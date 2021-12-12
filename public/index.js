@@ -356,7 +356,7 @@
     qs(".confirm-view").classList.remove("hidden");
     qs(".order-view").classList.add("hidden");
     qs(".error-view").classList.add("hidden");
-    let wrapper = qs(".confirm-view b");
+    let wrapper = qs(".confirm-view span");
     wrapper.textContent = num;
   }
 
@@ -462,7 +462,7 @@
     let stars = gen("p");
     stars.classList.add("rating-num");
     stars.textContent = "Price: ";
-    let num = gen("b");
+    let num = gen("span");
     num.textContent = rating;
     stars.appendChild(num);
     container.appendChild(stars);

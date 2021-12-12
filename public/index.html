@@ -28,8 +28,8 @@
       <ul class='navbar'>
         <li id="home-btn" class="nav-btn">Home</li>
         <li id="orders-btn" class="nav-btn">Orders</li>
-        <li id="logout-btn" class="nav-btn" style="float:right">Logout</li>
-        <li id="login-btn" class="nav-btn" style="float:right">Login</li>
+        <li id="logout-btn" class="nav-btn right">Logout</li>
+        <li id="login-btn" class="nav-btn right">Login</li>
       </ul>
     </section>
 
@@ -60,12 +60,12 @@
         <section class='iteminfo'>
           <img
             class="item-img"
-            src=""
+            src="placeholder"
             alt="Divine Blessing">
           <section>
             <p class="item-name">Divine Blessing</p>
             <div class="rating">
-              <p class="rating-num">Rating: <b>4.5</b></p>
+              <p class="rating-num">Rating: <span>4.5</span></p>
               <div class="token"></div>
               <div class="token"></div>
               <div class="token"></div>
@@ -102,7 +102,7 @@
 
       <section class="confirm-view">
         <h2>Item accquired!</h2>
-        <p>Order confirmation number: <b>2</b></p>
+        <p>Order confirmation number: <span>2</span></p>
         <div class="confirm-img"></div>
       </section>
 
@@ -118,19 +118,19 @@
         </header>
         <form class="login-form" id="login-form">
           <label for='email'>Email</label>
-          <input type='email' id='email' name='email' required>
+          <input type='email' id='email1' name='email' required>
           <label for='passcode'>Password</label>
-          <input type='text' id='passcode' name='passcode' required>
+          <input type='text' id='passcode1' name='passcode' required>
           <button>Login</button>
         </form>
 
         <form class="newuser-form" id="newuser-form">
           <label for='email'>Email</label>
-          <input type='email' id='email' name='email' required>
+          <input type='email' id='email2' name='email' required>
           <label for='username'>User Name</label>
           <input type='text' id='username' name='username' required>
           <label for='passcode'>Password</label>
-          <input type='text' id='passcode' name='passcode' required>
+          <input type='text' id='passcode2' name='passcode' required>
           <button>Register</button>
         </form>
       </section>
