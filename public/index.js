@@ -76,7 +76,6 @@
    * checks if user is loged in, and initialize navbar accordingly
    */
   function checkUser() {
-    console.log(document.cookie);
     let sid = idFromCookie();
     if (sid) {
       id("orders-btn").classList.remove("hidden");
