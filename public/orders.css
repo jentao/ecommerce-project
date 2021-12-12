@@ -7,7 +7,7 @@
   width: 250px;
 }
 
-.order-view .item-img, .order-view .order-info {
+.order-view .item-img, .order-view .order-info, .order-view .review-form {
   display: inline-block;
   vertical-align: top;
 }
@@ -18,6 +18,15 @@
 
 .order-view .order {
   margin: 5px 0;
+}
+
+.review-form {
+  margin-left: 30px;
+}
+
+.review-form input, .review-form label, .review-form button {
+  display: block;
+  margin: 10px 0;
 }
 
 .hidden {

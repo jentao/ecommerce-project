@@ -184,8 +184,8 @@ app.post("/darksouls/history", async function(req, res) {
  */
 app.post("/darksouls/rate", async function(req, res) {
   let sessionid = req.cookies['sessionid'];
-  if (sessionid && req.body.id && req.body.stars && req.body.stars <= max && req.body.stars >= 1 &&
-    req.body.orderid) {
+  if (sessionid && req.body.itemid && req.body.stars && req.body.stars <= max &&
+    req.body.stars >= 1 && req.body.orderid) {
     try {
       let db = await getDBConnection();
       let q3 = 'SELECT rated FROM orders WHERE orderid = ? ;';
@@ -197,8 +197,8 @@ app.post("/darksouls/rate", async function(req, res) {
         let comment = req.body.comment ? req.body.comment : "";
         let q1 = 'SELECT userid FROM users WHERE sessionid = ? ;';
         let user = await db.get(q1, [sessionid]);
-        let q2 = 'INSERT INTO ratings (userid,itemid,comment,stars) VALUES( ?, ?, ?, ? );';
-        await db.run(q2, [user.userid, req.body.id, comment, req.body.stars]);
+        let q2 = 'INSERT INTO ratings (userid, itemid,comment,stars) VALUES( ?, ?, ?, ? );';
+        await db.run(q2, [user.userid, req.body.itemid, comment, req.body.stars]);
         let q4 = 'UPDATE orders SET rated=rated+1 WHERE orderid= ? ;';
         db.run(q4, [req.body.orderid]);
         res.send('rate success');

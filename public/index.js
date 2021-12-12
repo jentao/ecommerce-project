@@ -25,7 +25,6 @@
       cards[i].addEventListener("click", showItem);
     }
     initForms();
-
   }
 
   /**
@@ -73,7 +72,7 @@
   }
 
   /**
-   * checks if user is loged in, and initialize navbar accordingly
+   * checks if user is loged in, and update navbar accordingly
    */
   function checkUser() {
     let sid = idFromCookie();
@@ -155,6 +154,120 @@
   }
 
   /**
+   * update the order page with corresponding orders of a user
+   * @param {array} orders a list of orders
+   */
+  function buildOrders(orders) {
+    id("orders").innerHTML = "";
+    for (let i = 0; i < orders.length; i++) {
+      id("orders").appendChild(buildOrder(orders[i]));
+    }
+  }
+
+  /**
+   * Returns the DOM container that represents an order card based on the given information
+   * @param {object} order the object that contains all the informaion about an order
+   * @returns {object} - a DOM <article> object that represents a product card
+   */
+  function buildOrder(order) {
+    let url = "/darksouls/item/" + order.itemid;
+    let container = gen("div");
+    container.classList.add("order");
+    // click order
+
+    let img = gen("img");
+    img.classList.add("item-img");
+    container.appendChild(img);
+
+    let body = gen("div");
+    body.classList.add("order-info");
+    let name = gen("p");
+    let price = gen("p");
+    price.classList.add("price");
+    let time = gen("p");
+    time.classList.add("time");
+    time.textContent = (new Date(order.orderDate)).toLocaleString();
+    body.appendChild(name);
+    body.appendChild(price);
+    body.appendChild(time);
+    container.appendChild(body);
+    getRequest(url, (data) => buildOrderItem(data, container));
+
+    if (order.rated === 0) {
+      buildReviewForm(order, container);
+    }
+    return container;
+  }
+
+  /**
+   * builds the review form for an order
+   * @param {object} order contains all the informaion about an order
+   * @param {object} container the DOM object to modify
+   */
+  function buildReviewForm(order, container) {
+    let form = gen("form");
+    form.classList.add("review-form");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      submitReview(order, new FormData(this));
+    });
+
+    let nlabel = gen("label");
+    nlabel.for = "num-review";
+    nlabel.textContent = "Rate this item";
+    let numInput = gen("input");
+    numInput.required = true;
+    numInput.type = "number";
+    numInput.id = "num-review";
+    numInput.name = "stars";
+    numInput.min = "1";
+    numInput.max = "5";
+
+    let comment = gen("textarea");
+    comment.name = "comment";
+    comment.rows = "5";
+    comment.cols = "30";
+
+    let btn = gen("button");
+    btn.textContent = "Submit";
+    form.appendChild(nlabel);
+    form.appendChild(numInput);
+    form.appendChild(comment);
+    form.appendChild(comment);
+    form.appendChild(btn);
+    container.appendChild(form);
+  }
+
+  /**
+   * submits a review
+   * @param {object} order contains all the informaion about an order
+   * @param {object} formdata data from the review form
+   */
+  function submitReview(order, formdata) {
+    let url = "/darksouls/rate";
+    formdata.set("itemid", order.itemid);
+    formdata.set("orderid", order.orderid);
+    console.log(formdata);
+    postRequest(url, formdata, showOrders, false);
+  }
+
+  /**
+   * Modifies the DOM container that represents the order with item information
+   * @param {object} item the object that contains all the informaion about an order
+   * @param {object} container the DOM object to modify
+   */
+  function buildOrderItem(item, container) {
+    let img = container.querySelector(".item-img");
+    img.src = item.imagePath;
+    img.alt = item.itemName;
+
+    let name = container.querySelector("p");
+    name.textContent = item.itemName;
+    let price = container.querySelector(".price");
+    price.textContent = item.price + " souls";
+  }
+
+  /**
    * show login page
    */
   function showLogin() {
@@ -178,6 +291,8 @@
     qs(".confirm-view").classList.add("hidden");
     qs(".order-view").classList.remove("hidden");
     qs(".error-view").classList.add("hidden");
+    let url = "/darksouls/history";
+    postRequest(url, null, buildOrders, true);
   }
 
   /**
