@@ -355,7 +355,7 @@ async function checkUser(sessionid) {
 async function checkBuy(itemid, sessionid, capacity) {
   if (!itemid) {
     return ("Missing one or more of the required params.");
-  } else if (!checkUser(sessionid)) {
+  } else if (!(await checkUser(sessionid))) {
     return ("User not logged in.");
   } else if (!(await checkid(itemid))) {
     return ("itemid does not exist");
