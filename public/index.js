@@ -20,11 +20,64 @@
     id("login-btn").addEventListener("click", showLogin);
     id("logout-btn").addEventListener("click", logout);
     id("home-btn").addEventListener("click", showHome);
-    let cards = qsa(".product");
-    for (let i = 0; i < cards.length; i++) {
-      cards[i].addEventListener("click", showItem);
-    }
     initForms();
+    id("switch").addEventListener("click", toggleView);
+    id("filter-type").addEventListener("change", filterItems);
+    id("search-btn").addEventListener("click", search);
+  }
+
+  /**
+   * Filter the Itemss on the homepage based on the input from search bar
+   */
+  function search() {
+    let tvalue = id("search-mode").value;
+    let keyword = id("search-term").value.trim();
+    let url = "/darksouls/items/?" + tvalue + "=" + keyword;
+    id("search-term").value = "";
+    getRequest(url, populateProducts);
+  }
+
+  /**
+   * Filters the home page items based on their stock status
+   */
+  function filterItems() {
+    let fvalue = id("filter-type").value;
+    let hitems = [];
+    let items = [];
+    let items2 = [];
+    if (fvalue === "outofstock") {
+      hitems = qsa(".in-stock");
+      items = qsa(".out-of-stock");
+    } else if (fvalue === "instock") {
+      items = qsa(".in-stock");
+      hitems = qsa(".out-of-stock");
+    } else {
+      items = qsa(".in-stock");
+      items2 = qsa(".out-of-stock");
+    }
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove("hidden");
+    }
+    for (let i = 0; i < items2.length; i++) {
+      items2[i].classList.remove("hidden");
+    }
+    for (let i = 0; i < hitems.length; i++) {
+      hitems[i].classList.add("hidden");
+    }
+  }
+
+  /**
+   * Toggles between grid and list view for home page
+   */
+  function toggleView() {
+    let isList = id("switch").checked;
+    if (!isList) {
+      qs(".products").classList.remove("list");
+      qs(".products").classList.add("grid");
+    } else {
+      qs(".products").classList.add("list");
+      qs(".products").classList.remove("grid");
+    }
   }
 
   /**
@@ -124,11 +177,8 @@
     let container = gen("article");
     container.classList.add("product");
     container.id = item.itemid;
-    if (item.capacity === 0) {
-      container.classList.add("out-of-stock");
-    } else {
-      container.classList.add("in-stock");
-    }
+    container.classList.add(item.capacity === 0 ? "out-of-stock" : "in-stock");
+    container.addEventListener("click", () => showItem(item.itemid));
 
     let img = gen("img");
     img.src = item.imagePath;
@@ -173,7 +223,6 @@
     let url = "/darksouls/item/" + order.itemid;
     let container = gen("div");
     container.classList.add("order");
-    // click order
 
     let img = gen("img");
     img.classList.add("item-img");
@@ -247,7 +296,6 @@
     let url = "/darksouls/rate";
     formdata.set("itemid", order.itemid);
     formdata.set("orderid", order.orderid);
-    console.log(formdata);
     postRequest(url, formdata, showOrders, false);
   }
 
@@ -297,8 +345,9 @@
 
   /**
    * show confirm page
+   * @param {string} num confirm num of an order
    */
-  function showConfirm() {
+  function showConfirm(num) {
     checkUser();
     qs(".home").classList.add("hidden");
     qs(".itemview").classList.add("hidden");
@@ -306,20 +355,131 @@
     qs(".confirm-view").classList.remove("hidden");
     qs(".order-view").classList.add("hidden");
     qs(".error-view").classList.add("hidden");
+    let wrapper = qs(".confirm-view b");
+    wrapper.textContent = num;
   }
 
   /**
-   * show item page
+   * show item page with gien item id
+   * @param {string} iid of the item to display
    */
-  function showItem() {
+  function showItem(iid) {
     checkUser();
-    toggleButton();
     qs(".login-view").classList.add("hidden");
     qs(".home").classList.add("hidden");
     qs(".itemview").classList.remove("hidden");
     qs(".confirm-view").classList.add("hidden");
     qs(".order-view").classList.add("hidden");
     qs(".error-view").classList.add("hidden");
+    let itemurl = "/darksouls/item/" + iid;
+    let reviewurl = "/darksouls/ratings/" + iid;
+    getRequest(itemurl, buildItem);
+    getRequest(reviewurl, buildReviews);
+  }
+
+  /**
+   * builds the item page for an item
+   * @param {object} data contains all the informaion about an item
+   */
+  function buildItem(data) {
+    let container = qs(".iteminfo");
+    let img = qs(".iteminfo img");
+    img.src = data.imagePath;
+
+    let body = qs(".iteminfo section");
+    let name = body.querySelector(".item-name");
+    name.textContent = data.itemName;
+
+    let type = body.querySelector(".item-type");
+    type.textContent = data.itemType;
+
+    let price = body.querySelector(".item-price span");
+    price.textContent = data.price + " souls";
+
+    let desc = body.querySelector(".item-desc");
+    desc.textContent = data.lore;
+
+    // reference https://stackoverflow.com/questions/9251837/how-to-remove-all-listeners-in-an-element
+    let oldBtn = id("buy-btn");
+    let newBtn = oldBtn.cloneNode(true);
+    newBtn.disabled = (data.capacity === 0);
+    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+    toggleButton(data.capacity !== 0, data.itemid);
+    container.appendChild(body);
+  }
+
+  /**
+   * builds the review section for an item
+   * @param {object} data contains all the informaion about an item
+   */
+  function buildReviews(data) {
+    let container = qs(".iteminfo .rating");
+    buildRating(data.avg["avg(stars)"], container);
+    let reviews = id("review-list");
+    reviews.innerHTML = "";
+    for (let i = 0; i < data.ratings.length; i++) {
+      reviews.appendChild(buildReview(data.ratings[i]));
+    }
+  }
+
+  /**
+   * builds one review card for an item
+   * @param {object} data contains all the review information for one review
+   * @returns {object} the DOM object that represents one review card
+   */
+  function buildReview(data) {
+    let container = gen("div");
+    container.classList.add("review");
+    let name = gen("p");
+    name.classList.add("username");
+    name.textContent = data.username;
+    let rating = gen("p");
+    rating.classList.add("user-rating");
+    rating.textContent = data.stars;
+    let time = gen("p");
+    time.classList.add("time");
+    time.textContent = (new Date(data.ratingDate)).toLocaleString();
+    let comment = gen("p");
+    comment.classList.add("comment");
+    comment.textContent = data.comment;
+    container.appendChild(name);
+    container.appendChild(rating);
+    container.appendChild(time);
+    container.appendChild(comment);
+    return container;
+  }
+
+  /**
+   * updates the average rating section for an item
+   * @param {float} rating the avg rating
+   * @param {object} container the container to populate
+   */
+  function buildRating(rating, container) {
+    const max = 5;
+    rating = rating ? rating : max;
+    container.innerHTML = "";
+    let stars = gen("p");
+    stars.classList.add("rating-num");
+    stars.textContent = "Price: ";
+    let num = gen("b");
+    num.textContent = rating;
+    stars.appendChild(num);
+    container.appendChild(stars);
+
+    const tokenWidtth = 32;
+    let token = gen("div");
+    token.classList.add("token");
+    let i = 1;
+    while (i <= rating) {
+      let tokenCopy = token.cloneNode(true);
+      container.appendChild(tokenCopy);
+      i += 1;
+    }
+    if (rating - i + 1 > 0) {
+      let tokenCopy = token.cloneNode(true);
+      tokenCopy.style.width = tokenWidtth * (rating - i + 1) + "px";
+      container.appendChild(tokenCopy);
+    }
   }
 
   /**
@@ -338,18 +498,41 @@
   }
 
   /**
-   * Toggle item purchase button
+   * Toggle item purchase button based on stock status
+   * @param {boolean} inStock true is in stock, false otherwise
+   * @param {string} iid tid of the item
    */
-  function toggleButton() {
+  function toggleButton(inStock, iid) {
     let btn = id("buy-btn");
-    if (Math.random() < 1) {
+    if (inStock) {
       btn.disabled = false;
       btn.textContent = "Purchase";
-      btn.addEventListener("click", showConfirm);
+      btn.addEventListener("click", () => confirm(iid));
     } else {
       btn.disabled = true;
       btn.textContent = "Currently Unavailable";
     }
+  }
+
+  /**
+   * confirm before purchase an item
+   * @param {string} iid tid of the item
+   */
+  function confirm(iid) {
+    let btn = id("buy-btn");
+    btn.textContent = "Confirm";
+    btn.addEventListener("click", () => purchase(iid));
+  }
+
+  /**
+   * Purchase an item
+   * @param {string} iid tid of the item
+   */
+  function purchase(iid) {
+    let url = "/darksouls/buy";
+    let data = new FormData();
+    data.append("itemid", iid);
+    postRequest(url, data, (num) => showConfirm(num), false);
   }
 
   /**

@@ -131,7 +131,7 @@ app.post("/darksouls/buy", async function(req, res) {
   let sessionid = req.cookies['sessionid'];
   try {
     let db = await getDBConnection();
-    let itemid = req.body.id;
+    let itemid = req.body.itemid;
     let q1 = 'SELECT price, capacity FROM items WHERE itemid = ? ;';
     let item = await db.get(q1, [itemid]);
     let err = await checkBuy(itemid, sessionid, item.capacity);
