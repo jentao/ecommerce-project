@@ -145,7 +145,6 @@ app.post("/darksouls/buy", async function(req, res) {
         res.status(CLIENT_ERROR).send('User does not have enough souls.');
       } else {
         await db.close();
-        console.log('hi');
         let oid = await order(itemid, item, user);
         res.type('text');
         res.send(oid);
