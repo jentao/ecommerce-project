@@ -178,7 +178,7 @@ Already logged out.
 #### Endpoint 7: Adds a new rating for a product
 **Request Format:** `/darksouls/rate`
 
-**Body Parameters:** `sessionid`, `itemid`, `stars`, `comment`(optional)
+**Body Parameters:** `sessionid`, `itemid`, `stars`, `orderid`, `comment`(optional)
 
 **Request Type:** `POST`
 
@@ -194,6 +194,7 @@ rate success
 **Error Handling:**
 - Possible 400 (invalid request)
   - If missing params: `Invalid Params.`
+  - If the order has alredy been commented: `Already commented.`
 - Possible 500 (Server Error)
   - If something went wrong on the server: `An error occurred on the server. Try again later.`
 
