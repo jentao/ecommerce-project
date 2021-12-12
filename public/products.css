@@ -6,10 +6,10 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
 }
 
 .products .product {
-  padding-left: 25px;
   transition: all 200ms ease-out;
 }
 
@@ -19,6 +19,39 @@
 
 .products .price {
   color: ghostwhite;
+}
+
+.grid .rating-num, .grid .item-desc {
+  display: none;
+}
+
+.grid.products {
+  flex-direction: row;
+  gap: 5px 15px;
+}
+
+.list.products {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px 0;
+}
+
+.list .rating-num, .list .item-desc {
+  display: block;
+  white-space: pre-line;
+}
+
+.list .productimg, .list .item-info {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.list .item-info {
+  width: 75%;
+}
+
+.list .productimg {
+  width: 18%;
 }
 
 .tools {
@@ -41,7 +74,7 @@
   color: white;
   display: block;
   width: 200px;
-  height: 28px;
+  height: 26px;
   text-indent: 60px;
   clip: rect(0 0 0 0);
   user-select: none;
@@ -66,8 +99,8 @@
 .switch-wrapper .switch-label:after {
   top: 0;
   left: 0;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background-color: #fff;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
@@ -84,7 +117,7 @@
 
 #search-term {
   margin-left: 10px;
-  width: 400px;
+  width: 350px;
   height: 24px;
 }
 
