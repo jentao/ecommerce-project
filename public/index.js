@@ -466,7 +466,7 @@
     container.innerHTML = "";
     let stars = gen("p");
     stars.classList.add("rating-num");
-    stars.textContent = "Price: ";
+    stars.textContent = "Rating: ";
     let num = gen("span");
     num.textContent = rating;
     stars.appendChild(num);
